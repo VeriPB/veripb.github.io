@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>VeriPB</title>
+    <link rel="shortcut icon" href="veripb-icon.png">
+  </head>
+  <body class="container">
+    <!-- <p>Navigation: <a
+      href="index.html" class="menu">Front Page</a><a
+      href="projects.html" class="menu">Solvers</a><a
+      href="publications.html" class="menu">Publications</a>
+    </p> -->
+    <h1 class="row">
+      <span class="col-xs-12">
+        <img src="veripb-logo-with-subtitle.svg" alt="VeriPB"
+      </span>
+    </h1>
+    <div class="row">
+      <div class="col-xs-8">
+        <section>
+          <h2>About</h2>
+          <p class="lead">
+          VeriPB is a general-purpose proof format for certificates of correctness 
+          produced by proof-logging algorithms.
+          </p>
+          <p>
+            The underlying proof system uses pseudo-Boolean reasoning: cutting planes on
+            0-1 integer linear inequalities, augmented with strengthening and 
+            convenience rules. It can express and certify a range of sophisticated
+            combinatorial solving techniques. 
+            
+            Documentation of the format as used in the 2025 SAT competition is available 
+            <a href="https://satcompetition.github.io/2025/downloads/checkers/veripb.pdf">here</a>.
+          </p>
+          <p>A number of solvers can produce VeriPB proofs, including:
+            <ul>
+              <li>The <a href="https://github.com/arminbiere/cadical">CaDiCaL</a> SAT solver.</li>
+              <li>The <a href="https://gitlab.com/nonfiction-software/exact">Exact</a> PB solver.</li>
+              <li>The <a href="https://github.com/ciaranm/glasgow-constraint-solver">Glasgow Constraint Solver</a></li>
+              <li>The <a href="https://github.com/ciaranm/glasgow-subgraph-solver">Glasgow Subgraph Solver</a></li>
+              <li>The <a href="https://zenodo.org/records/13912714">Pacose</a> MaxSAT solver</li>
+              <li>The <a href="https://github.com/scipopt/papilo">PaPILO</a> MIP pre-solver</li>
+              <li>The <a href="https://github.com/DietVds/CertifiedMaxSAT">QMaxSATpb</a> MaxSAT solver</li>
+              <li>The <a href="https://gitlab.com/MIAOresearch/software/roundingsat">RoundingSAT</a> PB solver</li>
+              <li>The <a href="https://github.com/chrjabs/scuttle">Scuttle</a> multi-object MaxSAT solver</li>
+              <!---->
+            </ul>
+          </p>
+        </section>
+
+        <section>
+          <h2><a id="news">News</a></h2>
+          <ul>
+            <li> <b>Nov 2025</b> The <a href="https://www.floc26.org/">FLoC</a> workshop proposal for a 3rd International Workshop on Highlights in Organizing and Optimizing Proof-logging Systems (WHOOPS ‘26) has been accepted, and according to the current tentative schedule the workshop is expected to take place during the first block of FLoC 2026 workshops July 18-19.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2><a name="developers"></a>People</h2>
+          
+          <h5>Contributors:</h5>
+          <ul class="list-inline"><li>
+                Markus Anders</li><li>
+                Jeremias Berg</li><li>
+                Bart Bogaerts</li><li>
+                Benjamin Bogø</li><li>
+                Wolf De Wulf</li><li>
+                Emir Demirović</li><li>
+                Simon Dold</li><li>
+                Jan Elffers</li><li>
+                Ambros Gleixner</li><li>
+                Stephan Gocht</li><li>
+                Arthur Gontier</li><li>
+                Malte Helmert</li><li>
+                Alexander Hoen</li><li>
+                Hannes Ihalainen</li><li>
+                Matti Järvisalo</li><li>
+                Wietze Koops</li><li>
+                Daniel Le Berre</li><li>
+                Ruben Martins</li><li>
+                Ross McBride</li><li>
+                Matthew McIlree</li><li>
+                Magnus O. Myreen</li><li>
+                Jakob Nordström</li><li>
+                Andy Oertel</li><li>
+                Tobias Paxian</li><li>
+                Patrick Prosser</li><li>
+                Adrián Rebola-Pardo</li><li>
+                Gabriele Röger</li><li>
+                Tanja Schindler</li><li>
+                Konstantin Sidorov</li><li>
+                Yong Kiam Tan</li><li>
+                James Trimble</li><li>
+                Dieter Vandesande</li><li>
+                Marc Vinyals</li><li>
+          </ul>
+
+          <h4>Acknowledgements</h4>
+          <ul class="ack">
+          <!--  TODO -->
+          </ul>
+        </section>
+      </div>
+      <section class="col-xs-4">
+        <h4>Software</h4>
+        The <a href="https://gitlab.com/MIAOresearch/software/VeriPB">Rust implementation</a> 
+        of the VeriPB proof checking tool is hosted on GitLab.
+        This tool can also "elaborate" VeriPB proofs to a kernel format that can be 
+        verified by the 
+        <a href="https://gitlab.com/MIAOresearch/software/cakepb">CakePB</a> 
+        checker. This is itself formally verified using the 
+        <a href="https://cakeml.org/">CakeML</a> toolchain. 
+
+        <h4>Tutorials</h4>
+        <p>A series of tutorials on VeriPB proof logging and it's applications was 
+          given at 
+          <a href="https://www.youtube.com/watch?v=4AbbnR8ZLOk&list=PLJ_jdOcEi5wYMdxEFrxMHiKelxufQl0L1">WHOOPS '25</a> 
+        </p>
+  </section>
+</div>
+  </body>
+</html>
+

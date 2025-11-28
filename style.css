@@ -1,0 +1,68 @@
+h1,h2,h2 a,h2 a:hover { color: #53629E }
+h3,h4,h5 { color: #473472; }
+body { margin-top: 1rem; margin-bottom: 1rem; }
+h4 { margin-top: 2rem; margin-bottom: 0.5rem; }
+h5 { display: inline; }
+.copyright { font-size: 8px; }
+footer { font-size: 12px; margin-top: 2rem; }
+.ack { font-size: 12px; list-style-type: none; padding-left: 0em; }
+img.img { width:80%; margin-left: auto; display: block; margin-right: auto; padding-top: 5pt; }
+img.compiler { width:100%; padding-top: 15pt; }
+img.candle { width:25%;min-width:150px;margin-left:20px;margin-bottom:20px;float:right;}
+.pure { color: #0B6ADE; }
+img.pure { width: 100%; margin-top: 2rem; }
+a.menu:link, a.menu:visited {
+  padding: 8px 8px;
+  text-align: center;
+  display: inline-block;
+}
+
+a.menu:hover, a:active {
+  color: white;
+  background-color: #473472;
+  text-decoration: none;
+}
+
+td {
+  padding-top: 8px;
+  padding-right: 8px;
+}
+
+.project {
+  width: 45%;
+  margin: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-bottom: 10pt;
+  float: left;
+  outline: 1px solid grey;
+}
+
+.newproject {
+  width: 45%;
+  margin: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-bottom: 2%;
+  float: left;
+  outline: 1px dashed grey;
+}
+
+@media only screen and (max-width: 1000px) {
+  .project { width: 95%; }
+  .newproject { width: 95%; }
+}
+
+.projh {
+  padding-bottom: 3pt;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.inlineimage {
+  width: 100%; padding-top: 10px; padding-bottom: 10px;
+}
