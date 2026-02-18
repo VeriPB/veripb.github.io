@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>VeriPB Overview</title>
+    <link rel="shortcut icon" href="img/favicon.svg">
+</head>
+
+<body class="container">
+    <p>Navigation:
+        <a href="index.html" class="menu">Front Page</a>
+        <a href="overview.html" class="menu">Proof Format Overview</a>
+        <a href="publications.html" class="menu">Publications</a>
+    </p>
+    <i>Note this page is automatically generated from the corresponding markdown file <a
+            href="https://gitlab.com/MIAOresearch/software/veripb/-/raw/main/proof_format_overview.md">on
+            GitLab.</a></i>
+    <h1>VeriPB Proof Format Overview</h1>
+    <p>This document provides a brief overview of the formula file formats supported by VeriPB and the VeriPB proof
+        format.</p>
+    <h2>Useful Examples</h2>
+    <p>A good way to getting started is probably to have a look at the examples under
+        <code>tests/instances/correct</code> and to run VeriPB with the <code>--trace</code> option, which will output
+        the derived proof.
+    </p>
+    <p>For example:</p>
+    <pre><code class="language-bash">cd tests/integration_tests/correct
+veripb --trace version3/all_diff.opb version3/all_diff.pbp
+</code></pre>
+    <h2>Supported Formula File Formats</h2>
+    <h3>OPB</h3>
+    <p>The formula is provided in <a href="http://www.cril.univ-artois.fr/PB12/format.pdf">OPB</a> format. A short
+        overview can be found <a
+            href="https://gitlab.com/MIAOresearch/roundingsat/-/blob/master/InputFormats.md">here</a>.</p>
+    <p>The verifier also supports an extension to OPB, which allows arbitrary variable names instead of <code>x1</code>,
+        <code>x2</code>, ... Variable names must follow the following properties:
+    </p>
+    <ul>
+        <li>start with a letter in <code>A-Z, a-z</code></li>
+        <li>are at least two characters long</li>
+        <li>may not contain space</li>
+        <li>variables introduced by VeriPB start with <code>_</code></li>
+    </ul>
+    <p>The following characters are guaranteed to be supported: <code>a-z, A-Z, 0-9, []{}_^-</code>. Support of further
+        characters is implementation specific and produces an error if unsupported characters are used.</p>
+    <h3>DIMACS CNF</h3>
+    <p>The formula can be provided in the <a
+            href="https://web.archive.org/web/20190325181937/https://www.satcompetition.org/2009/format-benchmarks2009.html">DIMACS
+            CNF format</a>. This format is then internally viewed as a OPB formula.</p>
+    <h4>Variables</h4>
+    <p>The variable <code>i</code> in the DIMACS CNF format is represented by <code>x&lt;i&gt;</code> and the literal
+        <code>-i</code> is <code>~x&lt;i&gt;</code>.
+    </p>
+    <h4>Clauses</h4>
+    <p>The semantics of DIMACS CNF are followed with respect to duplicate literals in clauses. Hence, the clause
+        <code>1 -2 1 0</code> becomes the constraint <code>1 x1 1 ~x2 &gt;= 1 ;</code>.
+    </p>
+    <h3>MaxSAT</h3>
+    <p>The formula can also be provided in <a href="https://maxsat-evaluations.github.io/2022/rules.html#input">MaxSAT
+            (WCNF)</a> format (both old and new format are supported). This format is then internally viewed as a OPB
+        formula.</p>
+    <h4>Variables</h4>
+    <p>The variable <code>i</code> in the WCNF format input file is represented by <code>x&lt;i&gt;</code>.</p>
+    <h4>Hard Clauses</h4>
+    <p>Hard clauses are viewed as OPB constraints, where all coefficients are <code>1</code> and the right-hand side is
+        <code>1</code>.
+    </p>
+    <h4>Soft Clauses</h4>
+    <p>Soft clauses containing one literal are added directly to the objective without adding a constraint to the
+        database. This is done by adding the negated literal and the weight of the soft clause as the coefficient to the
+        objective.</p>
+    <p>Soft clauses with more than one literal are reformulated using a blocking literal <code>_b&lt;i&gt;</code>, where
+        <code>i</code> is the index of the soft clause in the WCNF input file. Then the soft clauses with the literal
+        <code>~_b&lt;i&gt;</code> is added to the OPB formula as a constraint and the literal <code>~_b&lt;i&gt;</code>
+        with the weight of the soft clause as coefficient is added to the objective.
+    </p>
+    <h4>Example</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>WCNF</th>
+                <th>OPB</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td><code>min: 1 ~x1 1 ~_b3 2 ~x2 2 ~_b5</code></td>
+            </tr>
+            <tr>
+                <td><code>1 1 0</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code>h 1 2 3 0</code></td>
+                <td><code>1 x1 1 x2 1 x3 &gt;= 1</code></td>
+            </tr>
+            <tr>
+                <td><code>1 2 3 0</code></td>
+                <td><code>1 x2 1 x3 1 ~_b3 &gt;= 1</code></td>
+            </tr>
+            <tr>
+                <td><code>2 2 0</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code>2 1 2 0</code></td>
+                <td><code>1 x1 1 x2 1 ~_b5 &gt;= 1</code></td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Basic Proof Format</h2>
+    <h3>TLDR;</h3>
+    <pre><code>pseudo-Boolean proof version 2.0
+* compute constraint in polish notation
+pol &lt;sequence of operations in reverse polish notation&gt;
+* introduce constraint that is verified by reverse unit propagation
+rup  &lt;OPB style constraint&gt; ;
+* delete constraints
+del id &lt;constraintID1&gt; &lt;constraintID2&gt; &lt;constraintID3&gt; ...
+* objective update
+obju &lt;OPB style objective&gt; ;
+* add constraint by redundance based strengthening
+red &lt;OPB style constraint&gt; ; &lt;substitution&gt;
+* add constraint by dominance based strengthening
+dom &lt;OPB style constraint&gt; ; &lt;substitution&gt;
+</code></pre>
+    <h3>Introduction</h3>
+    <p>There are multiple rules, which are described in more detail below. Every rule has to be written on one line and
+        no line may contain more than one rule. Each rule can create an arbitrary number of constraints (including
+        none). The verifier keeps a database of constraints and each constraint is assigned an index, called
+        ConstraintID, starting from 1 and increasing by one for every added constraint. Rules can reference other
+        constraints by their ConstraintID.</p>
+    <p>The constraints from the formula file are loaded before any rule is executed and get the first ConstraintIDs.</p>
+    <p>In what follows we will use IDmax to refer to the largest used ID before a rule is executed.</p>
+    <h4>Constraint Labels</h4>
+    <p>Additionally to the ConstraintID, a label for a constraint can be specified. The ConstraintID and the label can
+        be used interchangeably in proofs. Labels have to start with the character <code>@</code>. To define a label for
+        a constraint in the OPB file, prepend the constraint with the label, e.g.,</p>
+    <pre><code>@label_name 1 x1 1 x2 1 x3 &gt;= 1
+</code></pre>
+    <p>To define a label for a constraint introduced by a rule, start the line of the rule with the label, e.g.,</p>
+    <pre><code>@label_name pol 1 2 + 3 d
+</code></pre>
+    <p>If a constraint label is defined that has already been defined earlier, then the label will be overwritten with
+        the new ConstraintID.</p>
+    <p>To refer to a constraint with the label <code>@label_name</code>, just use the label instead of the ConstraintID,
+        e.g.,</p>
+    <pre><code>pol 1 @label_name + 3 d
+</code></pre>
+    <p>Hence, in the following, whenever a ConstraintID is used as an argument for a proof rule, a label can be used
+        instead of the ConstraintID.</p>
+    <h3>(pol) Reverse Polish Notation</h3>
+    <pre><code>pol &lt;sequence in reverse polish notation&gt;
+</code></pre>
+    <p>Add a new constraint with ConstraintID := IDmax + 1. How to derive the constraint is describe by a 0 terminated
+        sequence of arithmetic operations over the constraints. These are written down in reverse polish notation. We
+        will use <code>[constraint]</code> to indicate either a ConstraintID or a subsequence in reverse polish
+        notation. Available operations are:</p>
+    <h4>Addition</h4>
+    <pre><code>&lt;constraint&gt; &lt;constraint&gt; +
+</code></pre>
+    <h4>Scalar Multiplication</h4>
+    <pre><code>&lt;constraint&gt; &lt;factor&gt; *
+</code></pre>
+    <p>The factor is a strictly positive integer and needs to be the second
+        operand.</p>
+    <h4>Boolean Division</h4>
+    <pre><code>&lt;constraint&gt; &lt;divisor&gt; d
+</code></pre>
+    <p>The divisor is a strictly positive integer and needs to be the second
+        operand.</p>
+    <h4>Boolean Saturation</h4>
+    <pre><code>&lt;constraint&gt; s
+</code></pre>
+    <h4>Literal Axioms</h4>
+    <pre><code>&lt;literal&gt;
+x1
+~x1
+</code></pre>
+    <p>Where <code>&lt;literal&gt;</code> is a variable name or its negation (<code>~</code>) and generates the
+        constraint that the literal is greater equal zero. For example for <code>~x1</code> this generates the
+        constraint <code>~x1 &gt;= 0</code>.</p>
+    <h4>Weakening</h4>
+    <pre><code>&lt;constraint&gt; &lt;variable&gt; w
+</code></pre>
+    <p>Where <code>&lt;variable&gt;</code> is a variable name and may not contain negation. This step adds literal
+        axioms such that <code>&lt;variable&gt;</code> disappears from the constraint, i.e., its coefficient becomes
+        zero.</p>
+    <h4>Conclusion</h4>
+    <p>This set of instructions allows writing down any treelike refutation with a single rule.</p>
+    <p>For example</p>
+    <pre><code>pol 42 3 * 43 + s 2 d
+</code></pre>
+    <p>Creates a new constraint by taking 3 times the constraint with index 42, then adds constraint 43, followed by a
+        saturation step and a division by 2.</p>
+    <h3>(rup) Reverse Unit Propagation</h3>
+    <pre><code>rup &lt;OPB style constraint&gt; ;
+rup &lt;OPB style constraint&gt; ; &lt;ID1&gt; &lt;ID2&gt; ...
+</code></pre>
+    <p>Use reverse unit propagation to check if the constraint is implied, i.e., it temporarily adds the negation of the
+        constraint and performs unit propagation, including all other (non deleted) constraints in the database. If this
+        unit propagation yields contradiction then we know that the constraint is implied and the check passes.</p>
+    <p>Optionally, the rule can be annotated by a list of constraint IDs. If this list is given, then VeriPB will only
+        perform unit propagation on these constraints. The reserved symbol <code>~</code> is used to specify the
+        negation of the constraint that we want to derive. VeriPB will first perform the unit propagation in the order
+        of the list. Hence, if the propagation order is known, then the constraint IDs should be printed in order.</p>
+    <p>If the reverse unit propagation check passes then the constraint is added with ConstraintID := IDmax + 1.
+        Otherwise, verification fails.</p>
+    <h3>(del) Delete Constraint</h3>
+    <pre><code>del id &lt;constraintID1&gt; &lt;constraintID2&gt; &lt;constraintID3&gt; ...
+del spec &lt;OPB style constraint&gt; ;
+del range &lt;constraintIDStart&gt; &lt;constraintIDEnd&gt;
+</code></pre>
+    <p>Delete constraints with given constrain IDs, specification or in the range from <code>constraintIDStart</code> to
+        <code>constraintIDEnd</code>, including <code>constraintIDStart</code> but not <code>constraintIDEnd</code>. If
+        a constraint is deleted that propagated under the empty assignment (e.g., a unit clause), then the propagations
+        from this constraint are also deleted from the trail, which is different to DRAT.
+    </p>
+    <h4>Deletion from the Core Set</h4>
+    <p>A constraint can only be deleted from the core set after a deletion check has been performed. The deletion check
+        comes in two flavours. By default, VeriPB runs the <a href="#checked-deletion">checked deletion checks</a>, as
+        this check guarantees that the new core set and the input formula are
+        equienumerable/equioptimal/equisatisfiable. If the checked deletion check fails for any deletion from the core,
+        these guarantees are lost and VeriPB only performs <a href="#unchecked-deletion">unchecked deletion checks</a>
+        for the rest of the proof, as they are computationally less expensive (and never fails).</p>
+    <h5>Unchecked Deletion</h5>
+    <p>Unchecked deletion performs the following checks:
+        1. If <strong>no</strong> order is loaded, accept deletion.
+        2. Otherwise, if the derived set is empty, accept deletion.
+        3. Otherwise, move all constraints from the derived set to the core set and accept deletion.</p>
+    <p>So unchecked deletion will never fail as it can automatically change the database to satisfy the second check.
+    </p>
+    <h5>Checked Deletion</h5>
+    <p>The idea of checked deletion is that we can rederive the deleted constraint from the remaining constraints in the
+        core by <a href="#red-redundance-based-strengthening">redundance-based strengthening</a>.</p>
+    <p>The deletion checks of multiple constraints will be done in the order in which the constraints are given. For
+        instance, if we delete $C$ and $D$ and have the set of core constraints $\mathcal{C}$, then it is first checked
+        that $C$ can be derived from $\mathcal{C} \setminus { C }$ and then that $D$ can be derived from $\mathcal{C}
+        \setminus { C, D }$.</p>
+    <p>The syntax for a deletion check is very similar to <a href="#red-redundance-based-strengthening">redundance-based
+            strengthening</a>. Checked deletion will create the same proofgoals as redundance-based strengthening and a
+        substitution can be supplied if required to prove the proofgoals.</p>
+    <p>The following syntax is used for checked deletion with a witness:</p>
+    <pre><code>&lt;deletion rule&gt; &lt;deletion parameters&gt; ; &lt;substitution&gt;
+</code></pre>
+    <p>The syntax of <code>&lt;substitution&gt;</code> is described in the <a href="#substitution">substitution
+            section</a>.</p>
+    <p>The proofgoals of checked deletion can be manually proven using the <a href="#subproofs">subproof</a> syntax, or
+        they are <a href="#autoproving">autoproven</a> by VeriPB if they are trivial enough.</p>
+    <h3>(delc) Delete Core Constraint</h3>
+    <pre><code>delc &lt;constraintID1&gt; &lt;constraintID2&gt; &lt;constraintID3&gt; ...
+</code></pre>
+    <p>This rule is identical to <a href="#delete-constraint"><code>del id</code></a> except that it checks if all
+        <code>constraintIDs</code> are from the core set. So the rule will fail if at least one
+        <code>constraintID</code> is from the derived set.
+    </p>
+    <h3>(deld) Delete Derived Constraint</h3>
+    <pre><code>deld &lt;constraintID1&gt; &lt;constraintID2&gt; &lt;constraintID3&gt; ...
+</code></pre>
+    <p>This rule is identical to <a href="#delete-constraint"><code>del id</code></a> except that it checks if all
+        <code>constraintIDs</code> are from the derived set. So the rule will fail if at least one
+        <code>constraintID</code> is from the core set.
+    </p>
+    <h3>(obju) Objective Update</h3>
+    <pre><code>* objective update to new objective
+obju new &lt;new objective f_new in OPB format&gt; ;
+* objective update by difference
+obju diff &lt;f_new - f_old in OPB format&gt; ;
+* or with explicit subproof
+obju new &lt;new objective f_new in OPB format&gt; ; begin
+    proofgoal #1
+        * proof f_new &gt;= f_current
+        &lt;subproof&gt;
+    end -1
+    proofgoal #2
+        * proof f_current &gt;= f_new
+        &lt;subproof&gt;
+    end -1
+end
+</code></pre>
+    <p>The version <code>obju new</code> of the rule updates the objective to the specified objective.</p>
+    <p>The version <code>obju diff</code> updates the objective by adding the specified difference between old and new
+        objective to the old objective. Subtracting the old objective from the new objective results in an affine
+        function, like all objective functions. Hence, the same syntax is used for stating a difference or an objective.
+    </p>
+    <p>The new objective will be the only valid objective after the update.</p>
+    <p>To update the objective, it has to be shown that the previous objective ($f_{current}$) is equal to the new
+        objective ($f_{new}$). This is done by showing that the constraints $f_{new} \geq f_{current}$ and $f_{current}
+        \geq f_{new}$ can be derived from the formula. If these two constraints can be trivially proven by <a
+            href="#autoproving">autoproving</a>, then no subproofs have to be specified to derive these two constraints.
+        Otherwise, subproofs have to be specified for the constraints. The proofgoal ID for the constraint $f_{new} \geq
+        f_{current}$ is <code>#1</code> and for the constraint $f_{current} \geq f_{new}$ the proofgoal ID is
+        <code>#2</code>.
+    </p>
+    <p><strong>Attention:</strong> To maintain soundness, <a href="#autoproving">autoproving</a> and subproofs can only
+        use constraints from the core set. Technically, this condition is not necessary for deriving $f_{current} \geq
+        f_{new}$ (proofgoal <code>#2</code>), but for simplicity, this condition is required for the derivation of both
+        constraints.</p>
+    <h2>Strengthening Rules</h2>
+    <h3>Substitution</h3>
+    <p>A substitution <code>&lt;substitution&gt;</code> is a space separated sequence of multiple mappings from a
+        variable to a constant or a literal.</p>
+    <pre><code>&lt;variable&gt; -&gt; 0
+&lt;variable&gt; -&gt; 1
+&lt;variable&gt; -&gt; &lt;literal&gt;
+</code></pre>
+    <p>Using <code>-&gt;</code> is optional and can improve readability.</p>
+    <p>For example</p>
+    <pre><code>x1 -&gt; 0 x2 -&gt; ~x3
+x1 0 x2 ~x3
+</code></pre>
+    <h3>(red) Redundance-Based Strengthening</h3>
+    <pre><code>red &lt;OPB style constraint&gt; ; &lt;substitution&gt;
+</code></pre>
+    <p>Adding the constraint is successful if it passes the map e check via unit propagation or syntactic checks, i.e.,
+        if it can be shown that every assignment satisfying the constraints in the database $F$ but falsifying the
+        to-be-added constraint $C$ can be transformed into an assignment satisfying both by using the assignment (or
+        witness) $\omega$ provided by the list of literals. More formally it is checked that,</p>
+    <p>$$
+        F \land \neg C \models (F \land C)\upharpoonright\omega .
+        $$
+        For details, please refer to [<a href="#references">GN21</a>].</p>
+    <p>If the redundance rule is used in the context of optimization and / or dominance breaking, additional conditions
+        are checked. For details, please refer to [<a href="#references">BGMN23</a>].</p>
+    <h3>Subproofs</h3>
+    <p>For both strengthening rules it is possible to provide an explicit subproof. A subproof starts by ending the
+        strengthening step with <code>; begin</code> and is concluded by <code>end</code>. Within a subproof it is
+        possible to specify proof goals using <code>proofgoal &lt;goalID&gt;</code>, which are in turn terminated by
+        <code>end</code>. Each proofgoal needs to derive contradiction using the provided constraints.
+    </p>
+    <p>Example</p>
+    <pre><code>red 1 x1 &gt;= 1 ; x1 -&gt; 1 ; begin
+    proofgoal #1
+        pol -1 -2 +
+    end -1
+
+    proofgoal 1
+        rup &gt;= 1 ;
+    end -1
+end
+</code></pre>
+    <p>The <code>&lt;goalID&gt;</code> are as follows: If a goal originates from a constraint in the database the
+        <code>&lt;goalID&gt;</code> is identical to the constraintID of the constraint in the database. Otherwise, the
+        goalID starts with a <code>#</code> followed by a number which is increased for each goal in the following order
+        (if applicable): the constraint to be derived (only redundance), one goal per constraint in the order, one goal
+        for the negated order (only dominance), objective condition (only for optimization problems). Tip: Use
+        <code>--trace</code> option to display required goals.
+    </p>
+    <h4>Autoproving</h4>
+    <p>For a subproof or a single proofgoal VeriPB will try out some techniques to automatically prove
+        (<em>autoprove</em>) them. If VeriPB is able to do this, then it is not required to present an explicit proof
+        for the whole subproof or the single proofgoal.</p>
+    <p>A subproof can be autoproven if unit propagation derives contradiction with respect to the database and the
+        additional premises added at the start of the subproof (e.g., the negated constraint for <a
+            href="#red-redundance-based-strengthening">redundance-based strengthening</a>).</p>
+    <p>A proofgoal can be autoproven if the goal constraint is trivial (degree of falsity is zero), implied by <a
+            href="#rup-reverse-unit-propagation">reverse unit propagation (RUP)</a>, or <a
+            href="#i-implies">syntactically implied</a> by any constraint in the database or the additional premise,
+        where all variables that get assigned by unit propagation are substituted with their value in the premise and
+        conclusion constraint of the implication.</p>
+    <p>We recommend that you look at the trace (using the <code>--trace</code> option) of VeriPB to see what autoproving
+        is done by VeriPB and it can make sense to compare the performance of autoproving and explicit proofs for your
+        use case.</p>
+    <h3>(dom) Dominance Based Strengthening</h3>
+    <pre><code>dom &lt;OPB style constraint&gt; ; &lt;substitution&gt;
+</code></pre>
+    <p>For details, please refer to [<a href="#references">BGMN23</a>]. For syntax have a look at the example under
+        <code>tests/integration_tests/correct/dominance/example.pbp</code> .
+    </p>
+    <p>Example proof:</p>
+    <pre><code>def_order simple
+    * specify variables
+    vars
+        left u1
+        right v1
+    end
+
+    * define the order
+    def
+        -1 u1 1 v1 &gt;= 0 ;
+    end
+
+    * proof goal: transitivity
+    transitivity
+        vars
+            fresh_right w1
+        end
+        proof
+            proofgoal #1
+                p 1 2 + 3 +
+            qed -1
+        qed
+    qed
+end
+
+load_order simple x1
+dom 1 ~x1 &gt;= 1 ; x1 0
+</code></pre>
+    <h4>Order Definition</h4>
+    <pre><code>def_order &lt;order name&gt;
+    vars
+        left &lt;list of variables&gt;
+        right &lt;list of variables&gt;
+        aux &lt;list of variables&gt;
+    end
+
+    def
+        &lt;constraints defining the order&gt;
+    end
+
+    transitivity
+        vars
+            fresh_right &lt;list of variables&gt;
+        end
+        proof
+            &lt;subproofs&gt;
+        qed
+    end
+
+    reflexivity
+        proof
+            &lt;subproofs&gt;
+        qed
+    end
+end
+</code></pre>
+    <p>A new order ${\cal O}_\preceq(\vec{u}, \vec{v})$ (i.e., $\vec{u} \preceq \vec{v}$) can be defined using the above
+        syntax. The order is a preorder, thus the defined order need to be reflexive and transitive.</p>
+    <p>The first <code>vars</code> defines the variables used in the definition of the order. The variables after
+        <code>left</code> are the variables in $\vec{u}$ and the variables after <code>right</code> are the variables in
+        $\vec{v}$. The number of variables in $\vec{u}$ must be the same as in $\vec{v}$. The variables after
+        <code>aux</code> are additional variables that can be used to defined the order.
+    </p>
+    <p>The constraints in <code>def</code> define the order. Only variables in <code>left</code>, <code>right</code> and
+        <code>aux</code> can be used.
+    </p>
+    <p>The <code>transitivity</code> proof established that the order is transitive, i.e., if ${\cal
+        O}<em>\preceq(\vec{u}, \vec{v})$ and ${\cal O}</em>\preceq(\vec{v}, \vec{w})$, then ${\cal
+        O}<em>\preceq(\vec{u}, \vec{w})$. The variables after <code>fresh_right</code> are the variables in $\vec{w}$
+            and the number of variables in $\vec{w}$ has to be the same as in $\vec{u}$ (and $\vec{v}$). In the
+            <code>proof</code> it has to be proven that each constraint in ${\cal O}</em>\preceq(\vec{u}, \vec{w})$ can
+        be derived from the constraints in ${\cal O}<em>\preceq(\vec{u}, \vec{v})$ and ${\cal O}</em>\preceq(\vec{v},
+        \vec{w})$.</p>
+    <p>The <code>reflexivity</code> proof establishes that the order is reflexive, i.e., ${\cal O}<em>\preceq(\vec{u},
+            \vec{u})$. The <code>reflexivity</code> proof is optional if the reflexivity of the order is trivial
+            (negated constraints in ${\cal O}</em>\preceq(\vec{u}, \vec{u})$ are contradiction). In the
+        <code>proof</code> it has to be proven that each constraint in ${\cal O}_\preceq(\vec{u}, \vec{u})$ can be
+        derived from an empty formula.
+    </p>
+    <p>The transitivity proof has to come before the reflexivity proof (if an explicit reflexivity proof is given).</p>
+    <h3>Moving Constraints to Core</h3>
+    <pre><code>core id &lt;constraintID1&gt; &lt;constraintID2&gt; ...
+core range &lt;constraintIDStart&gt; &lt;constraintIDEnd&gt;
+</code></pre>
+    <h2>Output and Conclusion Section</h2>
+    <h3>TLDR;</h3>
+    <pre><code>* output section
+output &lt;output guarantee&gt; &lt;output type&gt;
+* conclusion section
+conclusion &lt;conclusion type&gt; [&lt;conclusion parameters&gt;]
+* end of proof
+end pseudo-Boolean proof
+</code></pre>
+    <p>Every proof has to end with the output and conclusion section. This section must contain in the following order:
+    </p>
+    <ol>
+        <li>the output section</li>
+        <li>the conclusion section</li>
+        <li>end of proof</li>
+    </ol>
+    <h3>Output Section</h3>
+    <pre><code>output &lt;output guarantee&gt; &lt;output type&gt;
+</code></pre>
+    <p>For the moment, the output guarantees <code>NONE</code>, <code>DERIVABLE</code>, <code>EQUISATISFIABLE</code>,
+        and <code>EQUIOPTIMAL</code> and output types <code>IMPLICIT</code>, and <code>FILE</code> are implemented.</p>
+    <h4>Output Guarantees</h4>
+    <p>The following table details the output guarantees and what is required for the guarantees. We refer to
+        <em>input</em> as the input problem that the proof starts with and <em>output</em> as the output problem to
+        check against.
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Identifier</th>
+                <th>Guarantee</th>
+                <th>Conditions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>NONE</code></td>
+                <td>no guarantee</td>
+                <td>output type is empty (just <code>output NONE</code>)</td>
+            </tr>
+            <tr>
+                <td><code>DERIVABLE</code></td>
+                <td><em>output</em> derivable from <em>input</em></td>
+                <td>no conditions</td>
+            </tr>
+            <tr>
+                <td><code>EQUISATISFIABLE</code></td>
+                <td><em>output</em> is equisatisfiable to <em>input</em></td>
+                <td>always checked deletion used, <em>input</em> does not have objective</td>
+            </tr>
+            <tr>
+                <td><code>EQUIOPTIMAL</code></td>
+                <td><em>output</em> has same optimal value as <em>input</em></td>
+                <td>always checked deletion used, <em>input</em> has objective</td>
+            </tr>
+            <tr>
+                <td><code>EQUIENUMERABLE</code> (<strong>not implemented</strong>)</td>
+                <td><em>output</em> has the same number of (optimal) solutions as <em>input</em></td>
+                <td>always checked deletion used, no preserved variable in the domain of a witness</td>
+            </tr>
+        </tbody>
+    </table>
+    <h4>Output Types</h4>
+    <p>The following table details the output types and how the output problem should be given.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Identifier</th>
+                <th>How to give output?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>FILE</code></td>
+                <td>external file in same format as input file gives as third positional argument (e.g.,
+                    <code>veripb input.opb proof.pbp output.opb</code>)
+                </td>
+            </tr>
+            <tr>
+                <td><code>CONSTRAINT</code> (<strong>not implemented</strong>)</td>
+                <td><code>output</code> is followed by a list of constraints (and objective) as in OPB format</td>
+            </tr>
+            <tr>
+                <td><code>IMPLICIT</code></td>
+                <td>output is implicitly the current core (and objective)</td>
+            </tr>
+            <tr>
+                <td><code>PERMUTATION</code> (<strong>not implemented</strong>)</td>
+                <td>constraints are permuted as given by a list of constraint IDs and current objective output</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Conclusion Section</h3>
+    <pre><code>conclusion NONE
+
+conclusion SAT [: &lt;literal&gt; &lt;literal&gt; ...]
+conclusion UNSAT [: &lt;constraintID&gt;]
+
+conclusion BOUNDS &lt;lower bound&gt; [: &lt;constraintID&gt;] &lt;upper bound&gt; [: &lt;literal&gt; &lt;literal&gt; ...]
+</code></pre>
+    <h4>Conclusion <code>NONE</code></h4>
+    <p>The conclusion <code>NONE</code> states that the proof concludes without any conclusion. This conclusion is
+        always valid, but no guarantees on the proof are enforced.</p>
+    <h4>Conclusion <code>SAT</code></h4>
+    <p>The conclusion <code>SAT</code> states that the formula is satisfiable. If this conclusion is used, then the
+        proof has to show that there exists at least one solution. To show this, a list of literals can be specified
+        after the conclusion, which must be a solution. If no solution is specified after the conclusion, then at least
+        one solution has to be logged using log (sol)ution.</p>
+    <h4>Conclusion <code>UNSAT</code></h4>
+    <p>The conclusion <code>UNSAT</code> states that the formula is unsatisfiable. If the proof claims this conclusion
+        then it has to show that contradiction can be derived. This can be done by explicitly deriving contradiction and
+        pointing to it as the optional hint after the conclusion. If no hint is given, then there must be a constraint
+        in the database that syntactically implies contradiction.</p>
+    <h4>Conclusion <code>BOUNDS</code></h4>
+    <p>This conclusion can only be used for optimization problems. The conclusion <code>BOUNDS</code> states that the
+        optimal value is between <code>&lt;lower bound&gt;</code> and <code>&lt;upper bound&gt;</code>. If the bounds
+        are equal, this means that the optimal value has been found.</p>
+    <p>To show the correctness of the <code>&lt;lower bound&gt;</code> a constraint $C$ that shows that the objective is
+        at least the <code>&lt;lower bound&gt;</code> has to be derived. This has to be done by explicitly deriving a
+        constraint that syntactically implies $C$ (which might already be derived in the proof). The ID of the
+        constraint that syntactically implies $C$ can optionally be given as a hint for the lower bound or VeriPB will
+        search through the database for this constraint.</p>
+    <p>To show the correctness of the <code>&lt;upper bound&gt;</code>, there must be a solution that has an objective
+        value that is at least as good as the <code>&lt;upper bound&gt;</code>. The solution can be given as a hint or
+        otherwise must have been logged before in the proof using the log (sol)ution rule.</p>
+    <p>For optimization problems there are the following special cases:
+        <strong>Infeasible:</strong> Use the lower bound and upper bound to <code>INF</code> (infinity) to denote an
+        infeasible instance. The hint for the lower bound should be a contradicting constraint and no hint is required
+        for the upper bound.
+        <strong>Unbounded:</strong> This case does not really exist for PB instances, so you would give the smallest
+        possible value as lower bound and upper bound. No hint is required for the lower bound and the hint for the
+        upper bound is an assignment that sets all literals in the objective to 0.
+        <strong>Only lower bound:</strong> The upper bound should be set to <code>INF</code>. No hint is required for
+        the upper bound.
+    </p>
+    <h3>End of Proof</h3>
+    <pre><code>end pseudo-Boolean proof
+</code></pre>
+    <p>The proof has to end with this line. Everything after this line is not part of this proof. It is possible to
+        start a new proof after this.</p>
+    <h2>Convenience Rules and Rules for Sanity Checks</h2>
+    <h3>TLDR;</h3>
+    <pre><code>* check number of constraints in formula
+f &lt;nProblemConstraints&gt;
+* check equality
+e &lt;OPB style constraint&gt; ; [&lt;ConstraintID&gt;]
+* add constraint if equal
+ea &lt;OPB style constraint&gt; ; [&lt;ConstraintID&gt;]
+* Check equality objective
+eobj &lt;OPB style objective&gt; ;
+* check implication
+i &lt;OPB style constraint&gt; ; [&lt;ConstraintID&gt;]
+* add constraint if implied
+ia &lt;OPB style constraint&gt; ; [&lt;ConstraintID&gt;]
+* set level (for easier deletion)
+#   &lt;level&gt;
+* wipe out level (for easier deletion)
+w   &lt;level&gt;
+* strengthening to core mode
+strengthening_to_core on|off
+</code></pre>
+    <h3>(f) Formula Check</h3>
+    <pre><code>f &lt;nProblemConstraints&gt;
+</code></pre>
+    <p>This rule can be used to check that the correct number of constraints have been loaded by VeriPB and to check
+        that the proof logger starts with the correct constraint ID.</p>
+    <p>The value of <code>&lt;nProblemConstraints&gt;</code> is the number of constraints counting equalities twice.
+        This is because equalities in the input formula are replaced by two inequalities, where the first inequality is
+        <code>&gt;=</code> and the second <code>&lt;=</code>. Afterwards, the <code>i</code>-th inequality in the input
+        formula gets <code>ID := IDmax + i</code>.
+    </p>
+    <p>If the constraint count does not match, then the verification fails. If the constraint count is missing, then the
+        check is ignored.</p>
+    <p>For example if we have the OPB file</p>
+    <pre><code>* #variable= 3 #constraint= 1
+1 x1 2 x2 &gt;= 1 ;
+1 x3 1 x4  = 1 ;
+</code></pre>
+    <p>then VeriPB will load the constraints</p>
+    <pre><code>1: 1 x1 2 x2 &gt;= 1 ;
+2: 1 x3 1 x4 &gt;= 1 ;
+3: -1 x3 -1 x4 &gt;= -1 ;
+</code></pre>
+    <p>so the following formula check will succeed</p>
+    <pre><code>pseudo-Boolean proof version 2.0
+f 3
+</code></pre>
+    <p>In the past, this rule was used to load the formula into VeriPB. However, VeriPB loads the full formula right
+        from the start now. So it is only used for checking that the right number of constraints have been loaded.</p>
+    <h3>(e) Equals</h3>
+    <pre><code>e &lt;OPB style constraint D&gt; ; [&lt;ConstraintID for C&gt;]
+</code></pre>
+    <p>Verify that C is the same constraint as D, i.e., has the same degree and contains the same terms (order of terms
+        does not matter). If the optional constraint ID of C is not specified, then this rule will check if there exists
+        the same constraint as D in the database.</p>
+    <h3>(ea) Equals and Add</h3>
+    <pre><code>ea &lt;OPB style constraint D&gt; ; [&lt;ConstraintID for C&gt;]
+</code></pre>
+    <p>Identical to <a href="#e-equals">equals</a> but also adds the constraint <code>D</code> to the database with
+        <code>ConstraintID := IDmax + 1</code>.
+    </p>
+    <h3>(eobj) Equal Objective</h3>
+    <pre><code>eobj &lt;OPB style objective&gt; ;
+</code></pre>
+    <p>This rule checks if the current objective is equal to the objective given in the rule. The given objective will
+        be normalized before performing the comparison with the normalized current objective function. If the check
+        fails, the proof checking fails.</p>
+    <h3>(i) Implies</h3>
+    <pre><code>i &lt;OPB style constraint D&gt; ; [&lt;ConstraintID for C&gt;]
+</code></pre>
+    <p>Verify that C syntactically implies D. I.e., it is possible to derive D from C by adding literal axioms followed
+        by one saturation step and finally adding literal axioms for the coefficients in D that are larger than the
+        degree of D. If the optional constraint ID of C is not specified, then this rule will check if there exists any
+        constraint in the database that syntactically implies D.</p>
+    <h3>(ia) Implies and Add</h3>
+    <pre><code>ia &lt;OPB style constraint D&gt; ; [&lt;ConstraintID for C&gt;]
+</code></pre>
+    <p>Identical to <a href="#i-implies">implies</a> but also adds the constraint that is implied to the database with
+        <code>ConstraintID := IDmax + 1</code>.
+    </p>
+    <h3>(#) Set Level</h3>
+    <pre><code># &lt;level&gt;
+</code></pre>
+    <p>This rule does mark all following constraints, up to the next invocation of this rule, with
+        <code>&lt;level&gt;</code>. <code>&lt;level&gt;</code> is a non-negative integer. Constraints which are
+        generated before the first occurrence of this rule are not marked with any level.
+    </p>
+    <h3>(w) Wipe out Level</h3>
+    <pre><code>w &lt;level&gt;
+</code></pre>
+    <p>Delete all constraints (see deletion command) that are marked with <code>&lt;level&gt;</code> or a greater
+        number. Constraints that are not marked with a level can not be removed with this command.</p>
+    <h3>Strengthening to Core Mode</h3>
+    <pre><code>strengthening_to_core on|off
+</code></pre>
+    <p>This rule enables (<code>strengthening_to_core on</code>) and disables (<code>strengthening_to_core off</code>)
+        the strengthening to core mode. When enabling the strengthening to core mode, all constraints are moved from the
+        set of derived constraints to the set of core constraints.</p>
+    <p>When the strengthening to core mode is active, then all constraints introduced by strengthening rules are added
+        to the set of core constraints instead of the set of derived constraints. This has the advantage that
+        redundance-based strengthening only has constraints from the core as proofgoals from the formula.</p>
+    <h2>Beyond Refutations</h2>
+    <h3>TLDR;</h3>
+    <pre><code>  * log solution
+  sol  &lt;literal&gt; &lt;literal&gt; ...
+  * log solution and add objective-improving constraint
+  soli &lt;literal&gt; &lt;literal&gt; ...
+  * log solution and add solution-excluding constraint
+  solx &lt;literal&gt; &lt;literal&gt; ...
+</code></pre>
+    <h3>(sol) Log Solution</h3>
+    <pre><code>sol &lt;literal&gt; &lt;literal&gt; ...
+sol x1 ~x2
+</code></pre>
+    <p>Given a partial assignment in form of a list of <code>&lt;literal&gt;</code>, i.e., variable names with
+        <code>~</code> as prefix to indicate negation, check that:
+    </p>
+    <ul>
+        <li>
+            <p>after unit propagation we are left with a full assignment to the current database, i.e., an assignment
+                that assigns all variables that are mentioned in a constraint in the formula or the proof</p>
+        </li>
+        <li>
+            <p>the full assignment does not violate any constraint in the current database</p>
+        </li>
+    </ul>
+    <h3>(soli) Log Solution and Add Objective-Improving Constraint</h3>
+    <pre><code>soli &lt;literal&gt; &lt;literal&gt; ...
+soli x1 ~x2
+</code></pre>
+    <p>This rule can only be used if the OPB file specifies an objective function $f(x)$, i.e., it contains a line of
+        the form</p>
+    <pre><code>min: &lt;coefficient&gt; &lt;literal&gt; &lt;coefficient&gt; &lt;literal&gt; ...
+</code></pre>
+    <p>This rule performs the same checks as the log (sol)ution rule.</p>
+    <p>If the check is successful then the constraint $f(x) \leq f(\rho) - 1$ is added with
+        <code>ConstraintID := IDmax +</code>1. If the check is not successful then verification fails.
+    </p>
+    <h3>(solx) Log Solution and Add Solution-Excluding Constraint</h3>
+    <pre><code>solx &lt;literal&gt; &lt;literal&gt; ...
+solx x1 ~x2
+</code></pre>
+    <p>This rule performs the same checks as the log (sol)ution rule.</p>
+    <p>If the check is successful then the clause consisting of the negation of all literals is added with
+        <code>ConstraintID := IDmax + 1</code>. If the check is not successful then verification fails.
+    </p>
+    <h2>Debugging and for Development Only</h2>
+    <h3>TLDR;</h3>
+    <pre><code>* add constraint as unchecked assumption
+a &lt;OPB style constraint&gt; ;
+* track the time of a section
+start_time &lt;name&gt;
+end_time &lt;name&gt;
+* check if constraint is not in database
+is_deleted &lt;OPB style constraint&gt; ;
+</code></pre>
+    <h3>(a) Unchecked Assumption</h3>
+    <pre><code>a &lt;OPB style constraint&gt; ;
+</code></pre>
+    <p>Adds the given constraint without any checks. The constraint gets <code>ConstraintID := IDmax + 1</code>. Proofs
+        that contain this rule are not valid, because it allows adding any constraint. For example one could simply add
+        contradiction directly.</p>
+    <p>This rule is intended to be used during solver development, when not all aspects of the solver have implemented
+        proof logging, yet. For example, imagine that the solver knows by some fancy algorithm that it is OK to add a
+        constraint C, however proof logging for the derivation of C is not implemented yet. Using this rule we can
+        simply add C without providing a derivation and check with VeriPB that all other derivations that are already
+        implemented are correct.</p>
+    <h3>Tracking Time to Check Sections of Proof</h3>
+    <p>The following 2 rules can be used to track the time of names sections in the proof. If there are multiple
+        sections with the same name, then the times are added up to a total time. The total time is displayed at the end
+        of the checking when the option <code>--stats</code> is used. The <code>&lt;name&gt;</code> of a section can be
+        any string that does not contain a whitespace.</p>
+    <h4>(start_time) Start Cutom Timer</h4>
+    <pre><code>start_time &lt;name&gt;
+</code></pre>
+    <p>Start the timer with the name <code>&lt;name&gt;</code>.</p>
+    <p><strong>Note:</strong> If the timer <code>&lt;name&gt;</code> is already running, then the second start will be
+        ignored and a warning is printed.</p>
+    <h4>(end_time) End Custum Timer</h4>
+    <pre><code>end_time &lt;name&gt;
+</code></pre>
+    <p>Stops the timer with the name <code>&lt;name&gt;</code> and adds the time that has been elapsed since the start
+        of the timer to the total time for the timer <code>&lt;name&gt;</code>.</p>
+    <p><strong>Note:</strong> If a timer is ended that is not running, then the end is ignored and a waring is printed.
+    </p>
+    <h3>(is_deleted) Check If Constraint is Deleted</h3>
+    <pre><code>is_deleted &lt;OPB style constraint&gt; ;
+</code></pre>
+    <p>This rule checks if the given constraint exists in the database. If the constraint is in the database, the proof
+        will fail. The proof continues normally if this constraint does not exist in the database.</p>
+    <p>This rule can be used to double-check that a constraint is truly deleted from the database maintained by the
+        checker.</p>
+    <h3>(fail) Fail Proof</h3>
+    <pre><code>fail
+</code></pre>
+    <p>This rule immediately fails the proof checking. This rule can be used to fail proof checking at a certain point
+        if the proof should only be checked until this point and not further.</p>
+</body>

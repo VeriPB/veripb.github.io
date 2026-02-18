@@ -1,165 +1,257 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <title>VeriPB</title>
-    <link rel="shortcut icon" href="veripb-icon.png">
-  </head>
-  <body class="container">
-    <!-- <p>Navigation: <a
-      href="index.html" class="menu">Front Page</a><a
-      href="projects.html" class="menu">Solvers</a><a
-      href="publications.html" class="menu">Publications</a>
-    </p> -->
-    <h1 class="row">
-      <span class="col-xs-12">
-        <img src="veripb-logo-with-subtitle.svg" alt="VeriPB"
-      </span>
-    </h1>
-    <div class="row">
-      <div class="col-xs-8">
-        <section>
-          <h2>About</h2>
-          <p class="lead">
-          VeriPB is a general-purpose proof format for certificates of correctness 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>VeriPB</title>
+  <link rel="shortcut icon" href="img/favicon.svg">
+</head>
+
+<body class="container">
+  <p>Navigation:
+    <a href="index.html" class="menu">Front Page</a>
+    <a href="overview.html" class="menu">Proof Format Overview</a>
+    <a href="publications.html" class="menu">Publications</a>
+  </p>
+  <h1 class="row">
+    <span class="col-xs-12">
+      <img src="img/veripb_logo.svg" alt="VeriPB" height="150" />
+    </span>
+  </h1>
+  <div class="row">
+    <div class="col-12 col-md-8">
+      <section>
+        <h2>About</h2>
+        <p class="lead">
+          VeriPB is a general-purpose proof format for certificates of correctness
           produced by proof-logging algorithms.
-          </p>
-          <p>
-            The underlying proof system uses pseudo-Boolean reasoning: cutting planes on
-            0-1 integer linear inequalities, augmented with strengthening and 
-            convenience rules. It can express and certify a range of sophisticated
-            combinatorial solving techniques. 
-            
-            Documentation of the format as used in the 2025 SAT competition is available 
-            <a href="https://satcompetition.github.io/2025/downloads/checkers/veripb.pdf">here</a>.
-          </p>
-          <p>A number of solvers can produce VeriPB proofs, including:
-            <ul>
-              <li>The <a href="https://github.com/arminbiere/cadical">CaDiCaL</a> SAT solver.</li>
-              <li>The <a href="https://gitlab.com/nonfiction-software/exact">Exact</a> PB solver.</li>
-              <li>The <a href="https://github.com/ciaranm/glasgow-constraint-solver">Glasgow Constraint Solver</a></li>
-              <li>The <a href="https://github.com/ciaranm/glasgow-subgraph-solver">Glasgow Subgraph Solver</a></li>
-              <li>The <a href="https://zenodo.org/records/13912714">Pacose</a> MaxSAT solver</li>
-              <li>The <a href="https://github.com/scipopt/papilo">PaPILO</a> MIP pre-solver</li>
-              <li>The <a href="https://github.com/DietVds/CertifiedMaxSAT">QMaxSATpb</a> MaxSAT solver</li>
-              <li>The <a href="https://gitlab.com/MIAOresearch/software/roundingsat">RoundingSAT</a> PB solver</li>
-              <li>The <a href="https://github.com/chrjabs/scuttle">Scuttle</a> multi-object MaxSAT solver</li>
-              <!---->
-            </ul>
-          </p>
-        </section>
-
-        <section>
-          <h2><a id="news">News</a></h2>
-          <ul>
-            <li> <b>Nov 2025</b> The <a href="https://www.floc26.org/">FLoC</a> workshop proposal for a 3rd International Workshop on Highlights in Organizing and Optimizing Proof-logging Systems (WHOOPS ‘26) has been accepted, and according to the current tentative schedule the workshop is expected to take place during the first block of FLoC 2026 workshops July 18-19.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2><a name="developers"></a>People</h2>
-          
-          <h5>Contributors:</h5>
-          <ul class="list-inline"><li>
-                Berhan Oumer <b>Adame</b></li><li>
-                <a href="https://markusanders.eu/">Markus <b>Anders</b></a></li><li>
-                <a href="https://jeremiasberg.com/">Jeremias <b>Berg</b></a></li><li>
-                <a href="https://www.bartbogaerts.eu/index.php">Bart <b>Bogaerts</b></a></li><li>
-                Benjamin <b>Bogø</b></li><li>
-                <a href="https://wulfdewolf.github.io/">Wolf <b>De Wulf</b></a></li><li>
-                <a href="https://emirde.github.io/">Emir <b>Demirović</b></a></li><li>
-                <a href="https://ai.dmi.unibas.ch/people/dold/index.html">Simon <b>Dold</b></a></li><li>
-                Jan <b>Elffers</b></li><li>
-                <a href="https://www.zib.de/userpage/gleixner/">Ambros <b>Gleixner</b></a></li><li>
-                <a href="https://drgocht.com/">Stephan <b>Gocht</b></a></li><li>
-                <a href="https://arthurgontierpro.github.io/">Arthur <b>Gontier</b></a></li><li>
-                <a href="https://ai.dmi.unibas.ch/people/helmert/">Malte <b>Helmert</b></a></li><li>
-                <a href="https://iol.zib.de/team/alexander-hoen.html">Alexander <b>Hoen</b></a></li><li>
-                <a href="https://www.helsinki.fi/en/about-us/people/people-finder/hannes-ihalainen-9417756">Hannes <b>Ihalainen</b></a></li><li>
-                <a href="https://www.cs.helsinki.fi/u/mjarvisa/">Matti <b>Järvisalo</b></a></li><li>
-                <a href="https://wkoops.github.io/">Wietze <b>Koops</b></a></li><li>
-                <a href="https://www.cril.fr/~leberre/">Daniel <b>Le Berre</b></a></li><li>
-                <a href="https://sat-group.github.io/ruben/">Ruben <b>Martins</b></a></li><li>
-                Ross <b>McBride</b></li><li>
-                <a href="https://ciaranm.github.io/">Ciaran  <b>McCreesh</b></a></li><li>
-                <a href="https://matthewmcilree.com/">Matthew <b>McIlree</b></a></li><li>
-                <a href="https://www.cse.chalmers.se/~myreen/">Magnus <b>O. Myreen</b></a></li><li>
-                <a href="https://jakobnordstrom.se/">Jakob <b>Nordström</b></a></li><li>
-                <a href="https://aoertel.de/">Andy <b>Oertel</b></a></li><li>
-                Tobias <b>Paxian</b></li><li>
-                <a href="https://www.dcs.gla.ac.uk/~pat/">Patrick <b>Prosser</b></a></li><li>
-                <a href="https://arpj-rebola.github.io/">Adrián <b>Rebola-Pardo</b></a></li><li>
-                <a href="https://ai.dmi.unibas.ch/people/roeger/index.html">Gabriele <b>Röger</b></a></li><li>
-                <a href="https://ai.dmi.unibas.ch/people/schindler/index.html">Tanja <b>Schindler</b></a></li><li>
-                <a href="https://ksidorov.com/">Konstantin <b>Sidorov</b></a></li><li>
-                <a href="https://tanyongkiam.github.io/">Yong Kiam <b>Tan</b></a></li><li>
-                <a href="https://www.dcs.gla.ac.uk/~jamest/">James <b>Trimble</b></a></li><li>
-                Dieter <b>Vandesande</b></li><li>
-                <a href="https://marcvinyals.gitlab.io/">Marc <b>Vinyals</b></a></li><li>
-                <!-- Benjamin <b>Bogø</b></li><li> -->
-                <!-- Berhan Oumer Adame</li><li> -->
-                <!-- Markus Anders</li><li> -->
-                <!-- Jeremias Berg</li><li> -->
-                <!-- Bart Bogaerts</li><li> -->
-                <!-- Benjamin Bogø</li><li> -->
-                <!-- Wolf De Wulf</li><li> -->
-                <!-- Emir Demirović</li><li> -->
-                <!-- Simon Dold</li><li> -->
-                <!-- Jan Elffers</li><li> -->
-                <!-- Ambros Gleixner</li><li> -->
-                <!-- Stephan Gocht</li><li> -->
-                <!-- Arthur Gontier</li><li> -->
-                <!-- Malte Helmert</li><li> -->
-                <!-- Alexander Hoen</li><li> -->
-                <!-- Hannes Ihalainen</li><li> -->
-                <!-- Matti Järvisalo</li><li> -->
-                <!-- Wietze Koops</li><li> -->
-                <!-- Daniel Le Berre</li><li> -->
-                <!-- Ruben Martins</li><li> -->
-                <!-- Ross McBride</li><li> -->
-                <!-- Matthew McIlree</li><li> -->
-                <!-- Magnus O. Myreen</li><li> -->
-                <!-- Jakob Nordström</li><li> -->
-                <!-- Andy Oertel</li><li> -->
-                <!-- Tobias Paxian</li><li> -->
-                <!-- Patrick Prosser</li><li> -->
-                <!-- Adrián Rebola-Pardo</li><li> -->
-                <!-- Gabriele Röger</li><li> -->
-                <!-- Tanja Schindler</li><li> -->
-                <!-- Konstantin Sidorov</li><li> -->
-                <!-- Yong Kiam Tan</li><li> -->
-                <!-- James Trimble</li><li> -->
-                <!-- Dieter Vandesande</li><li> -->
-                <!-- Marc Vinyals</li><li> -->
-          </ul>
-
-
-          <h4>Acknowledgements</h4>
-          <ul class="ack">
-          <!--  TODO -->
-          </ul>
-        </section>
-      </div>
-      <section class="col-xs-4">
-        <h4>Software</h4>
-        The <a href="https://gitlab.com/MIAOresearch/software/VeriPB">Rust implementation</a> 
-        of the VeriPB proof checking tool is hosted on GitLab.
-        This tool can also "elaborate" VeriPB proofs to a kernel format that can be 
-        verified by the 
-        <a href="https://gitlab.com/MIAOresearch/software/cakepb">CakePB</a> 
-        checker. This is itself formally verified using the 
-        <a href="https://cakeml.org/">CakeML</a> toolchain. 
-
-        <h4>Tutorials</h4>
-        <p>A series of tutorials on VeriPB proof logging and its applications was 
-          given at 
-          <a href="https://www.youtube.com/watch?v=4AbbnR8ZLOk&list=PLJ_jdOcEi5wYMdxEFrxMHiKelxufQl0L1">WHOOPS '25</a> 
         </p>
-  </section>
-</div>
-  </body>
-</html>
+        <p>
+          The underlying proof system uses pseudo-Boolean reasoning: cutting planes on
+          0-1 integer linear inequalities, augmented with strengthening and
+          convenience rules. It can express and certify a range of sophisticated
+          combinatorial solving techniques.
 
+          Documentation of the format as used in the 2025 SAT competition is available
+          <a href="https://satcompetition.github.io/2025/downloads/checkers/veripb.pdf">here</a>.
+        </p>
+        <p>A number of combinatorial solvers can produce VeriPB proofs, including:
+        <table class="pretty-table">
+          <tr>
+            <td>The <a href="https://github.com/arminbiere/cadical">CaDiCaL</a> SAT solver.</td>
+            <td>The <a href="https://gitlab.com/nonfiction-software/exact">Exact</a> PB solver.</td>
+            <td>The <a href="https://github.com/ciaranm/glasgow-constraint-solver">Glasgow Constraint Solver</a></td>
+          </tr>
+          <tr>
+            <td>The <a href="https://github.com/ciaranm/glasgow-subgraph-solver">Glasgow Subgraph Solver</a></td>
+            <td>The <a href="https://zenodo.org/records/13912714">Pacose</a> MaxSAT solver</td>
+            <td>The <a href="https://github.com/scipopt/papilo">PaPILO</a> MIP pre-solver</td>
+          </tr>
+          <tr>
+            <td>The <a href="https://github.com/DietVds/CertifiedMaxSAT">QMaxSATpb</a> MaxSAT solver</td>
+            <td>The <a href="https://gitlab.com/MIAOresearch/software/roundingsat">RoundingSAT</a> PB solver</td>
+            <td>The <a href="https://github.com/chrjabs/scuttle">Scuttle</a> multi-object MaxSAT solver</td>
+          </tr>
+        </table>
+      </section>
+
+      <section>
+        <h2><a id="news">News</a></h2>
+        <ul>
+          <li> <b>Nov 2025</b> The <a href="https://www.floc26.org/">FLoC</a> workshop proposal for a 3rd International
+            Workshop on Highlights in Organizing and Optimizing Proof-logging Systems (WHOOPS ‘26) has been accepted,
+            and according to the current tentative schedule the workshop is expected to take place during the first
+            block of FLoC 2026 workshops July 18-19.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><a name="people"></a>People</h2>
+
+        <h4>Active Maintainers:</h4>
+        <ul class="li class=" list-inline-item"st-inli class="list-inline-item" ne">
+          <li class="list-inline-item">
+            <a href="https://di.ku.dk/engli class=" list-inline-item"sh/staff/?pure=en/persons/836108">Benjamin
+              <b>Bogø</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://ai.dmi.unibas.ch/people/dold/index.html">Simon <b>Dold</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://arthurgontierpro.github.io/">Arthur <b>Gontier</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://wkoops.github.io/">Wietze <b>Koops</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://ciaranm.github.io/">Ciaran <b>McCreesh</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://matthewmcilree.com/">Matthew <b>McIlree</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://www.cse.chalmers.se/~myreen/">Magnus <b>O. Myreen</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://jakobnordstrom.se/">Jakob <b>Nordström</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://aoertel.de/">Andy <b>Oertel</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://arpj-rebola.github.io/">Adrián <b>Rebola-Pardo</b></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://tanyongkiam.github.io/">Yong Kiam <b>Tan</b></a>
+          </li>
+        </ul>
+        <h4>Contributors and Alumni:</h4>
+        <ul class="li class=" list-inline-item"st-inli class="list-inline-item" ne">
+          <li class="list-inline-item">
+            Berhan Oumer <b>Adame</b></li>
+          <li class="list-inline-item">
+            <a href="https://markusanders.eu/">Markus <b>Anders</b></a>
+          </li>
+          <!-- <li class="list-inline-item">
+              <a href="https://jeremiasberg.com/">Jeremias <b>Berg</b></a>
+            </li> -->
+          <li class="list-inline-item">
+            <a href="https://www.bartbogaerts.eu/index.php">Bart <b>Bogaerts</b></a>
+          </li>
+          <!-- <li class="list-inline-item">
+              <a href="https://wulfdewolf.github.io/">Wolf <b>De Wulf</b></a>
+            </li>
+            <li class="list-inline-item">
+              <a href="https://emirde.github.io/">Emir <b>Demirović</b></a>
+            </li> -->
+          <li class="list-inline-item">
+            Jan <b>Elffers</b></li>
+          <!-- <li class="list-inline-item">
+              <a href="https://www.zib.de/userpage/gleixner/">Ambros <b>Gleixner</b></a>
+            </li> -->
+          <li class="list-inline-item">
+            <a href="https://drgocht.com/">Stephan <b>Gocht</b></a>
+          </li>
+          <!-- <li class="list-inline-item">
+              <a href="https://ai.dmi.unibas.ch/people/helmert/">Malte <b>Helmert</b></a>
+            </li>
+            <li class="list-inline-item">
+              <a href="https://iol.zib.de/team/alexander-hoen.html">Alexander <b>Hoen</b></a>
+            </li> -->
+          <!-- <li class="list-inline-item">
+              <a href="https://www.helsinki.fi/en/about-us/people/people-finder/hannes-ihalainen-9417756">Hannes
+                <b>Ihalainen</b></a>
+            </li> -->
+          <!-- <li class="list-inline-item">
+              <a href="https://www.cs.helsinki.fi/u/mjarvisa/">Matti <b>Järvisalo</b></a>
+            </li> -->
+          <!-- <li class="list-inline-item">
+              <a href="https://www.cril.fr/~leberre/">Daniel <b>Le Berre</b></a>
+            </li> -->
+          <li class="list-inline-item">
+            <a href="https://sat-group.github.io/ruben/">Ruben <b>Martins</b></a>
+          </li>
+          <li class="list-inline-item">
+            Ross <b>McBride</b></li>
+          <!-- <li class="list-inline-item">
+              Tobias <b>Paxian</b></li> -->
+          <li class="list-inline-item">
+            <a href="https://www.dcs.gla.ac.uk/~pat/">Patrick <b>Prosser</b></a>
+          </li>
+          <!-- <li class="list-inline-item">
+              <a href="https://ai.dmi.unibas.ch/people/roeger/index.html">Gabriele <b>Röger</b></a>
+            </li> -->
+          <!-- <li class="list-inline-item">
+              <a href="https://ai.dmi.unibas.ch/people/schindler/index.html">Tanja <b>Schindler</b></a>
+            </li> -->
+          <!-- <li class="list-inline-item">
+              <a href="https://ksidorov.com/">Konstantin <b>Sidorov</b></a>
+            </li> -->
+          <li class="list-inline-item">
+            <a href="https://www.dcs.gla.ac.uk/~jamest/">James <b>Trimble</b></a>
+          </li>
+          <li class="list-inline-item">
+            Dieter <b>Vandesande</b></li>
+          <li class="list-inline-item">
+            <a href="https://marcvinyals.gitlab.io/">Marc <b>Vinyals</b></a>
+          </li>
+          <li class="list-inline-item">
+        </ul>
+
+        <h4>Collaborating Institutions</h4>
+        <ul>
+          <li>A*STAR, Singapore</li>
+          <li>Chalmers University of Technology, Sweden</li>
+          <li>The University of Copenhagen, Denmark</li>
+          <li>The University of Glasgow, Scotland</li>
+          <li>The University of Lund, Sweden</li>
+          <li>Nanyang Technological University, Singapore</li>
+          <li>Vienna University of Technology, Austria</li>
+          <li>Johannes Kepler University Linz, Austria</li>
+        </ul>
+        <h4>Acknowledgements</h4>
+        <ul class="ack">
+          <!--  TODO -->
+        </ul>
+      </section>
+
+    </div>
+
+    <section class="col-12 col-md-4">
+      <h4>Software</h4>
+      The <a href="https://gitlab.com/MIAOresearch/software/VeriPB">Rust implementation</a>
+      of the VeriPB proof checking tool is hosted on GitLab.
+      This tool can also "elaborate" VeriPB proofs to a kernel format that can be
+      verified by the
+      <a href="https://gitlab.com/MIAOresearch/software/cakepb">CakePB</a>
+      checker. This is itself formally verified using the
+      <a href="https://cakeml.org/">CakeML</a> toolchain.
+
+      <div class="button-group" style="text-align: center;">
+        <a href="https://gitlab.com/MIAOresearch/software/VeriPB" class="tool-btn primary">
+          <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+              class="bi bi-gitlab" viewBox="0 0 16 16">
+              <path
+                d="m15.734 6.1-.022-.058L13.534.358a.57.57 0 0 0-.563-.356.6.6 0 0 0-.328.122.6.6 0 0 0-.193.294l-1.47 4.499H5.025l-1.47-4.5A.572.572 0 0 0 2.47.358L.289 6.04l-.022.057A4.044 4.044 0 0 0 1.61 10.77l.007.006.02.014 3.318 2.485 1.64 1.242 1 .755a.67.67 0 0 0 .814 0l1-.755 1.64-1.242 3.338-2.5.009-.007a4.05 4.05 0 0 0 1.34-4.668Z" />
+            </svg></span>
+          VeriPB on GitLab
+        </a>
+
+        <a href="https://crates.io/crates/veripb" class="tool-btn">
+          <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+              class="bi bi-box-seam" viewBox="0 0 16 16">
+              <path
+                d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z" />
+            </svg></span>
+          VeriPB on crates.io
+        </a>
+
+
+        <a href="https://gitlab.com/MIAOresearch/software/cakepb" class="tool-btn">
+          <span class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gitlab"
+              viewBox="0 0 16 16">
+              <path
+                d="m15.734 6.1-.022-.058L13.534.358a.57.57 0 0 0-.563-.356.6.6 0 0 0-.328.122.6.6 0 0 0-.193.294l-1.47 4.499H5.025l-1.47-4.5A.572.572 0 0 0 2.47.358L.289 6.04l-.022.057A4.044 4.044 0 0 0 1.61 10.77l.007.006.02.014 3.318 2.485 1.64 1.242 1 .755a.67.67 0 0 0 .814 0l1-.755 1.64-1.242 3.338-2.5.009-.007a4.05 4.05 0 0 0 1.34-4.668Z" />
+            </svg> </span>
+          CakePB on GitLab
+        </a>
+      </div>
+      <h4>Tutorials</h4>
+      <p>A series of tutorials on VeriPB proof logging and its applications was
+        given at
+        <a href="https://www.youtube.com/watch?v=4AbbnR8ZLOk&list=PLJ_jdOcEi5wYMdxEFrxMHiKelxufQl0L1">WHOOPS '25</a>
+        <iframe width="100%" height="auto" style="margin-top: 30px;"
+          src="https://www.youtube.com/embed/videoseries?si=tNpC6Eg_5cX6esOf&amp;list=PLJ_jdOcEi5wYMdxEFrxMHiKelxufQl0L1"
+          title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+      </p>
+    </section>
+  </div>
+</body>
+
+</html>
