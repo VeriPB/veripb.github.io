@@ -207,6 +207,7 @@ if __name__ == "__main__":
         <h1> Publications </h1>
 
         <h3>How to cite VeriPB</h3>
+        <p>Please cite up to three of the following references in this order of priority. You can click on the references to get their BibTeX entry:</p>
         <p>
         <details>
         <summary>
@@ -284,7 +285,7 @@ if __name__ == "__main__":
 
         <h3>VeriPB in the Literature</h3>
         <p>The following is a list of scientific publications that make use of (some version of) VeriPB.</p>
-        <ul>
+        <ul class="list-unstyled">
     """
         f1.write(html_prelude)
         for bib_entry in bib_entries:
