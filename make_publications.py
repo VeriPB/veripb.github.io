@@ -239,7 +239,7 @@ if __name__ == "__main__":
         <summary>
         Stephan Gocht, and Jakob Nordström.
         Certifying Parity Reasoning Efficiently Using Pseudo-Boolean Proofs.
-        Proceedings of the 35th AAAI Conference on Artificial Intelligence (AAAI '21), 2021.
+        Proceedings of the 35th AAAI Conference on Artificial Intelligence (AAAI&nbsp;'21), 2021.
         </summary>
 
         <pre><code>
