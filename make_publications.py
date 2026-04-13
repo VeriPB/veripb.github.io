@@ -9,6 +9,8 @@ Author:
 
 import bibtexparser
 
+from common import STAT_COUNTER_HTML
+
 BIB_FILE = "publications.bib"
 BIBTYPE_PRIORITY = [
     "phdthesis",
@@ -291,4 +293,6 @@ if __name__ == "__main__":
         for bib_entry in bib_entries:
             bib = clean_entry(bib_entry)
             f1.write(get_bib_entry_as_html(bib_entry))
-        f1.write("</ul></div></div></body></html>")
+        f1.write(STAT_COUNTER_HTML)
+        f1.write("</ul></div></div>")
+        f1.write("</body></html")

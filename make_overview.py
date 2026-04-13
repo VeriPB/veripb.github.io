@@ -9,6 +9,8 @@ Author:
 import requests
 import markdown
 
+from common import STAT_COUNTER_HTML
+
 URL = "https://gitlab.com/MIAOresearch/software/veripb/-/raw/main/proof_format_overview.md"
 
 md_text = requests.get(URL).text
@@ -16,8 +18,7 @@ md_text = requests.get(URL).text
 html = markdown.markdown(md_text, extensions=["fenced_code", "tables"])
 
 with open("overview.html", "w") as f:
-    f.write(
-        """<!doctype html>
+    f.write("""<!doctype html>
 <html lang="en">
 
 <head>
@@ -37,9 +38,9 @@ with open("overview.html", "w") as f:
   </p>
   <i>Note this page is automatically generated from the corresponding markdown file <a
   href="https://gitlab.com/MIAOresearch/software/veripb/-/raw/main/proof_format_overview.md">on GitLab.</a></i>
-"""
-    )
+""")
     f.write(html)
-    f.write("</body>")
+    f.write(STAT_COUNTER_HTML)
+    f.write("</body></html>")
 
 print("Generated overview.html")
