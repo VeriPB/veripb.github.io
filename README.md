@@ -2,7 +2,9 @@
 
 This is the source repository for the `veripb.org` website.
 
-It mostly a plain html static site, using the [bootstrap]() theme for styles.
+It mostly a plain html static site, using the [bootstrap
+v5.3.8](https://blog.getbootstrap.com/2025/08/25/bootstrap-5-3-8/) theme for
+styles.
 
 ## Generated Pages
 The files publications.html and overview.html are generated using the corresponding python scripts. 
