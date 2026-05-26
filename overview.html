@@ -51,7 +51,10 @@ window.MathJax = {
 <li><a href="#veripb-proof-format-overview">VeriPB Proof Format Overview</a><ul>
 <li><a href="#useful-examples">Useful Examples</a></li>
 <li><a href="#supported-formula-file-formats">Supported Formula File Formats</a><ul>
-<li><a href="#opb">OPB</a></li>
+<li><a href="#opb">OPB</a><ul>
+<li><a href="#reification-shorthands">Reification Shorthands</a></li>
+</ul>
+</li>
 <li><a href="#dimacs-cnf">DIMACS CNF</a><ul>
 <li><a href="#variables">Variables</a></li>
 <li><a href="#clauses">Clauses</a></li>
@@ -135,6 +138,7 @@ window.MathJax = {
 <li><a href="#conclusion-sat">Conclusion SAT</a></li>
 <li><a href="#conclusion-unsat">Conclusion UNSAT</a></li>
 <li><a href="#conclusion-bounds">Conclusion BOUNDS</a></li>
+<li><a href="#conclusion-enumeration_complete-and-enumeration_partial">Conclusion ENUMERATION_COMPLETE and ENUMERATION_PARTIAL</a></li>
 </ul>
 </li>
 <li><a href="#end-of-proof">End of Proof</a></li>
@@ -145,6 +149,7 @@ window.MathJax = {
 <li><a href="#f-formula-check">(f) Formula Check</a></li>
 <li><a href="#e-equals">(e) Equals</a></li>
 <li><a href="#eobj-equal-objective">(eobj) Equal Objective</a></li>
+<li><a href="#eord_def-and-eord_loaded-check-order">(eord_def) and (eord_loaded) Check Order</a></li>
 <li><a href="#i-implies">(i) Implies</a></li>
 <li><a href="#ia-implies-and-add">(ia) Implies and Add</a></li>
 <li><a href="#setlvl-set-level">(setlvl) Set Level</a></li>
@@ -206,6 +211,15 @@ properties:</p>
 <p>The following characters are guaranteed to be supported: <code>a-z, A-Z, 0-9,
 []{}_^-</code>. Support of further characters is implementation specific and VeriPB may give
 an error if unsupported characters are used.</p>
+<h4 id="reification-shorthands">Reification Shorthands</h4>
+<p>As an additional extension to OPB, constraints may be written using reification
+shorthands as syntactic sugar for standard PB inequalities:</p>
+<pre><code>z1 z2 ~z3 ==&gt; +1 x1 +2 x2 &gt;= 2;  % if z1 ∧ z2 ∧ ¬z3 then x1 + 2x2 ≥ 2
+z1        &lt;== +1 x1 +2 x2 &gt;= 2;  % if x1 + 2x2 ≥ 2 then z1
+</code></pre>
+<p>The left implication (<code>&lt;==</code>) requires exactly one literal on the left; the
+right implication (<code>==&gt;</code>) allows one or more. These are interpreted as standard PB 
+inequalities and can be used anywhere an OPB-style constraint is expected.</p>
 <h3 id="dimacs-cnf">DIMACS CNF</h3>
 <p>An alternative format for the formula is the <a href="https://web.archive.org/web/20190325181937/https://www.satcompetition.org/2009/format-benchmarks2009.html">DIMACS CNF
 format</a>.
@@ -938,6 +952,16 @@ required for the lower bound and the hint for the upper bound is an assignment
 that sets all literals in the objective to 0.</p>
 <p><strong>Only lower bound:</strong> The upper bound should be set to <code>INF</code>. No hint is
 required for the upper bound.</p>
+<h4 id="conclusion-enumeration_complete-and-enumeration_partial">Conclusion <code>ENUMERATION_COMPLETE</code> and <code>ENUMERATION_PARTIAL</code></h4>
+<p>Two additional conclusion types are supported for enumeration problems </p>
+<pre><code>conclusion ENUMERATION_COMPLETE &lt;n&gt; : &lt;ConstraintID&gt; ;
+conclusion ENUMERATION_PARTIAL &lt;n&gt; ;
+</code></pre>
+<p><code>ENUMERATION_COMPLETE n : i</code> states that exactly <code>n</code> projected solutions have
+been witnessed via <code>solx</code>, and that constraint <code>i</code> is a contradiction
+(establishing there are no further solutions).</p>
+<p><code>ENUMERATION_PARTIAL n</code> states that at least <code>n</code> projected solutions have been
+witnessed, without claiming completeness.</p>
 <h3 id="end-of-proof">End of Proof</h3>
 <pre><code>end pseudo-Boolean proof ;
 </code></pre>
@@ -951,6 +975,12 @@ f &lt;nProblemConstraints&gt; ;
 e &lt;OPB style constraint&gt; : [&lt;ConstraintID&gt;] ;
 % Check equality objective
 eobj &lt;OPB style objective&gt; ;
+% check a defined order matches expected
+eord_def ...
+% check the currently loaded order and variables 
+eord_loaded &lt;order name&gt; &lt;vars&gt;;                 
+% check that no order is currently loaded
+eord_loaded;                                      
 % check syntactic implication
 i &lt;OPB style constraint&gt; : [&lt;ConstraintID&gt;] ;
 % add constraint if syntactically implied
@@ -1007,6 +1037,31 @@ the same constraint as D in the database.</p>
 the rule. The given objective will be normalized before performing the
 comparison with the normalized current objective function. If the check fails,
 the proof checking fails.</p>
+<h3 id="eord_def-and-eord_loaded-check-order">(eord_def) and (eord_loaded) Check Order</h3>
+<p>Sanity-check rules for verifying the current state of orders. For verifying that a rule with a given name is specified correctly</p>
+<pre><code>eord_def &lt;order name&gt;
+  vars
+    left &lt;left vars&gt; ;
+    right &lt;right vars&gt; ;
+    [aux &lt;aux vars&gt; ;]
+  end [vars] ;
+  [spec
+    &lt;OPB constraint&gt; ;
+    &lt;OPB constraint&gt; ;
+    ...
+  end [spec] ;]
+  def
+    &lt;OPB constraint&gt; ;
+    &lt;OPB constraint&gt; ;
+    ...
+  end [def] ;
+end [eord_def] ;
+</code></pre>
+<p>The <code>eord_def</code> rule can be used to verify that a rule with a given name is specified correctly. So if there is an order defined with the name <code>&lt;order name&gt;</code>, then this order has to have the same variables, definition and auxiliary specification as given in this rule. </p>
+<pre><code>eord_loaded &lt;order name&gt; &lt;vars&gt;;                  % check the currently loaded order and variables
+eord_loaded;                                      % check that no order is currently loaded
+</code></pre>
+<p>The <code>eord_loaded</code> check what the currently loaded order is.</p>
 <h3 id="i-implies">(i) Implies</h3>
 <pre><code>i &lt;OPB style constraint D&gt; : [&lt;ConstraintID for C&gt;] ;
 </code></pre>

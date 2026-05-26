@@ -39,6 +39,20 @@ The following characters are guaranteed to be supported: `a-z, A-Z, 0-9,
 []{}_^-`. Support of further characters is implementation specific and VeriPB may give
 an error if unsupported characters are used.
 
+#### Reification Shorthands
+
+As an additional extension to OPB, constraints may be written using reification
+shorthands as syntactic sugar for standard PB inequalities:
+
+```
+z1 z2 ~z3 ==> +1 x1 +2 x2 >= 2;  % if z1 ∧ z2 ∧ ¬z3 then x1 + 2x2 ≥ 2
+z1        <== +1 x1 +2 x2 >= 2;  % if x1 + 2x2 ≥ 2 then z1
+```
+
+The left implication (`<==`) requires exactly one literal on the left; the
+right implication (`==>`) allows one or more. These are interpreted as standard PB 
+inequalities and can be used anywhere an OPB-style constraint is expected.
+
 ### DIMACS CNF
 
 An alternative format for the formula is the [DIMACS CNF
@@ -919,6 +933,21 @@ that sets all literals in the objective to 0.
 **Only lower bound:** The upper bound should be set to `INF`. No hint is
 required for the upper bound.
 
+#### Conclusion `ENUMERATION_COMPLETE` and `ENUMERATION_PARTIAL`
+
+Two additional conclusion types are supported for enumeration problems 
+```
+conclusion ENUMERATION_COMPLETE <n> : <ConstraintID> ;
+conclusion ENUMERATION_PARTIAL <n> ;
+```
+
+`ENUMERATION_COMPLETE n : i` states that exactly `n` projected solutions have
+been witnessed via `solx`, and that constraint `i` is a contradiction
+(establishing there are no further solutions).
+
+`ENUMERATION_PARTIAL n` states that at least `n` projected solutions have been
+witnessed, without claiming completeness.
+
 ### End of Proof
 
 ```
@@ -939,6 +968,12 @@ f <nProblemConstraints> ;
 e <OPB style constraint> : [<ConstraintID>] ;
 % Check equality objective
 eobj <OPB style objective> ;
+% check a defined order matches expected
+eord_def ...
+% check the currently loaded order and variables 
+eord_loaded <order name> <vars>;                 
+% check that no order is currently loaded
+eord_loaded;                                      
 % check syntactic implication
 i <OPB style constraint> : [<ConstraintID>] ;
 % add constraint if syntactically implied
@@ -1022,6 +1057,39 @@ This rule checks if the current objective is equal to the objective given in
 the rule. The given objective will be normalized before performing the
 comparison with the normalized current objective function. If the check fails,
 the proof checking fails.
+
+### (eord_def) and (eord_loaded) Check Order
+
+Sanity-check rules for verifying the current state of orders. For verifying that a rule with a given name is specified correctly
+
+```
+eord_def <order name>
+  vars
+    left <left vars> ;
+    right <right vars> ;
+    [aux <aux vars> ;]
+  end [vars] ;
+  [spec
+    <OPB constraint> ;
+    <OPB constraint> ;
+    ...
+  end [spec] ;]
+  def
+    <OPB constraint> ;
+    <OPB constraint> ;
+    ...
+  end [def] ;
+end [eord_def] ;
+```
+
+The `eord_def` rule can be used to verify that a rule with a given name is specified correctly. So if there is an order defined with the name `<order name>`, then this order has to have the same variables, definition and auxiliary specification as given in this rule. 
+
+```
+eord_loaded <order name> <vars>;                  % check the currently loaded order and variables
+eord_loaded;                                      % check that no order is currently loaded
+```
+
+The `eord_loaded` check what the currently loaded order is.
 
 ### (i) Implies
 
