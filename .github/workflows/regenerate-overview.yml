@@ -1,0 +1,50 @@
+name: Regenerate Overview HTML
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch markdown from GitLab
+        run: |
+          curl -fsSL "https://gitlab.com/MIAOresearch/software/VeriPB/-/raw/main/proof_format_overview.md" \
+            -o proof_format_overview.md
+
+      - name: Check if markdown changed
+        id: diff
+        run: |
+          git diff --quiet proof_format_overview.md && echo "changed=false" >> $GITHUB_OUTPUT \
+            || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Set up Python
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        if: steps.diff.outputs.changed == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Run make_overview.py
+        if: steps.diff.outputs.changed == 'true'
+        run: python make_overview.py
+
+      - name: Commit and push changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add proof_format_overview.md overview.html
+          git commit -m "Auto-regenerate overview.html [skip ci]"
+          git push
