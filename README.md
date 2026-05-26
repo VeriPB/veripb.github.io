@@ -11,7 +11,7 @@ The files `publications.html`and `overview.html` are generated using the corresp
 Do not edit these directly: instead edit the scripts or the source data.
 
 To regenerate the html for these, the python packages listed in `requirements.txt` are needed.
-This can be installed in a virtual environment using 
+They can be installed in a virtual environment using 
 ```
 python3 -m venv venv
 source venv/bin/activate
@@ -22,4 +22,12 @@ Then run:
 python3 make_overview.py
 python3 make_publications.py
 ```
+
+### Github Action for Proof Overview
+ 
+Additionally, there is a GitHub action (see
+[`.github/workflows/regenerate-overview.yml`](.github/workflows/regenerate-overview.yml))
+to regenerate the overview.html file if changes are detected on the corresponding GitLab 
+page. This is set to run once per hour to poll for changes.
+
 
