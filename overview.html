@@ -1200,6 +1200,7 @@ is_deleted &lt;OPB style constraint&gt; ;
 </code></pre>
 <h3 id="a-unchecked-assertion">(a) Unchecked Assertion</h3>
 <pre><code>a &lt;OPB style constraint&gt; ;
+a &lt;OPB style constraint&gt; : &lt;ConstraintIds&gt; : &lt;name&gt; : &lt;free-text&gt;;
 </code></pre>
 <p>Adds the given constraint without any checks. The constraint gets <code>ConstraintID
 := IDmax + 1</code>. Proofs that contain this rule are not valid, because it allows
@@ -1210,6 +1211,10 @@ that the solver knows by some fancy algorithm that it is OK to add a constraint
 C, however proof logging for the derivation of C is not implemented yet. Using
 this rule we can simply add C without providing a derivation and check with
 VeriPB that all other derivations that are already implemented are correct.</p>
+<p>Assertions may optionally carry three colon-separated annotation fields — a list
+of antecedent constraint IDs, a name, and free-text hints — intended to be read
+by external tools; they have no semantic meaning in the main proof format. See
+the grammar document for the full syntax.</p>
 <h3 id="tracking-time-to-check-sections-of-proof">Tracking Time to Check Sections of Proof</h3>
 <p>The following 2 rules can be used to track the time of names sections in the
 proof. If there are multiple sections with the same name, then the times are

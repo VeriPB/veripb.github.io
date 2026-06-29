@@ -1302,6 +1302,7 @@ is_deleted <OPB style constraint> ;
 
 ```
 a <OPB style constraint> ;
+a <OPB style constraint> : <ConstraintIds> : <name> : <free-text>;
 ```
 
 Adds the given constraint without any checks. The constraint gets `ConstraintID
@@ -1314,6 +1315,11 @@ that the solver knows by some fancy algorithm that it is OK to add a constraint
 C, however proof logging for the derivation of C is not implemented yet. Using
 this rule we can simply add C without providing a derivation and check with
 VeriPB that all other derivations that are already implemented are correct.
+
+Assertions may optionally carry three colon-separated annotation fields — a list
+of antecedent constraint IDs, a name, and free-text hints — intended to be read
+by external tools; they have no semantic meaning in the main proof format. See
+the grammar document for the full syntax.
 
 ### Tracking Time to Check Sections of Proof
 
