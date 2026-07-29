@@ -53,6 +53,8 @@ window.MathJax = {
 <li><a href="#supported-formula-file-formats">Supported Formula File Formats</a><ul>
 <li><a href="#opb">OPB</a><ul>
 <li><a href="#reification-shorthands">Reification Shorthands</a></li>
+<li><a href="#equality-constraints">Equality Constraints</a></li>
+<li><a href="#labels">Labels</a></li>
 </ul>
 </li>
 <li><a href="#dimacs-cnf">DIMACS CNF</a><ul>
@@ -220,6 +222,19 @@ z1        &lt;== +1 x1 +2 x2 &gt;= 2;  % if x1 + 2x2 ≥ 2 then z1
 <p>The left implication (<code>&lt;==</code>) requires exactly one literal on the left; the
 right implication (<code>==&gt;</code>) allows one or more. These are interpreted as standard PB 
 inequalities and can be used anywhere an OPB-style constraint is expected.</p>
+<h4 id="equality-constraints">Equality Constraints</h4>
+<p>Equalities in the input OPB formula are interpreted as two inequalities, where the
+first inequality is <code>&gt;=</code> and the second <code>&lt;=</code>. Hence, an equality constraint will count
+as two constraints when parsed by VeriPB.</p>
+<h4 id="labels">Labels</h4>
+<p>VeriPB supports labels for constraints in the OPB format. A label starts with the
+character <code>@</code> followed by at least one of the characters <code>a-z, A-Z, 0-9, []{}_^-</code>.
+To label a constraint, the label needs to be given at the beginning of a line
+introducing a constraint, e.g.,</p>
+<pre><code>@label 1 x1 2 x2 3 x3 &gt;= 3 ;
+</code></pre>
+<p>Since each label can only map to one constraint, equality constraints can not be
+labelled in the OPB file. </p>
 <h3 id="dimacs-cnf">DIMACS CNF</h3>
 <p>An alternative format for the formula is the <a href="https://web.archive.org/web/20190325181937/https://www.satcompetition.org/2009/format-benchmarks2009.html">DIMACS CNF
 format</a>.
@@ -228,7 +243,8 @@ This format is then internally viewed as a OPB formula.</p>
 <p>The variable <code>i</code> in the DIMACS CNF format is represented by <code>x&lt;i&gt;</code> and the
 literal <code>-i</code> is <code>~x&lt;i&gt;</code>.</p>
 <h4 id="clauses">Clauses</h4>
-<p>VeriPB follows the semantics of DIMACS CNF with respect to duplicate literals
+<p>Each clause is viewed as an OPB constraint, where each coefficient is <code>1</code> and the right-hand side is also <code>1</code>.
+VeriPB follows the semantics of DIMACS CNF with respect to duplicate literals
 in clauses. Hence, the clause <code>1 -2 1 0</code> becomes the constraint <code>1 x1 1 ~x2 &gt;=
 1 ;</code>.
 Clauses containing opposing literals are normalized after deduplication so that all terms are over distinct literals.
@@ -241,8 +257,7 @@ as an OPB formula.</p>
 <h4 id="variables_1">Variables</h4>
 <p>The variable <code>i</code> in the WCNF format input file is represented by <code>x&lt;i&gt;</code>.</p>
 <h4 id="hard-clauses">Hard Clauses</h4>
-<p>Hard clauses are viewed as OPB constraints, where all coefficients are <code>1</code> and
-the right-hand side is <code>1</code>.</p>
+<p>Hard clauses are viewed as an OPB constraints and parsed in the same way as clauses in the <a href="#dimacs-cnf">DIMACS CNF</a> format.</p>
 <h4 id="soft-clauses">Soft Clauses</h4>
 <p>VeriPB will add soft clauses containing one literal directly to the objective
 without adding a constraint to the database. This is achieved by adding the
@@ -360,12 +375,15 @@ reverse polish notation, we can specify the available operations as follows.</p>
 the divisor.</p>
 <p>The divisor is a strictly positive integer and must be the second operand.</p>
 <p>Alternatively, the operation can specify division of the constraint in variable
-normal form (non-negated variables) by using <code>c</code></p>
+normal form (non-negated variables) by using <code>c</code>.</p>
 <pre><code>&lt;constraint&gt; &lt;divisor&gt; c
 </code></pre>
 <h4 id="boolean-saturation">Boolean Saturation</h4>
 <pre><code>&lt;constraint&gt; s
 </code></pre>
+<p>Saturation assumes that the constraint is in normalized form. Each coefficient
+of a constraint is clamped to be at most the right-hand side of the constraint.
+If the right-hand side is negative, then the coefficient for each term is zero.</p>
 <h4 id="literal-axioms">Literal Axioms</h4>
 <pre><code>&lt;literal&gt;
 </code></pre>
@@ -937,7 +955,9 @@ the objective is at least the <code>&lt;lower bound&gt;</code> has to be derived
 done by explicitly deriving a constraint that syntactically implies <span class="arithmatex"><script type="math/tex">C</script></span> (which
 might already be derived in the proof). The ID of the constraint that
 syntactically implies <span class="arithmatex"><script type="math/tex">C</script></span> can optionally be given as a hint for the lower bound
-or VeriPB will search through the database for this constraint.</p>
+or VeriPB will search through the database for this constraint. The claimed
+<code>&lt;lower bound&gt;</code> can be at most the objective value of any objective improving
+constraint derived by <code>soli</code> or <code>obji</code>.  </p>
 <p>To show the correctness of the <code>&lt;upper bound&gt;</code>, there must be a solution that
 has an objective value that is at least as good as the <code>&lt;upper bound&gt;</code>. The
 solution can be given as a hint, where the solution is evaluated with respect to the original problem, or otherwise must have been logged before in
@@ -999,9 +1019,7 @@ strengthening_to_core on|off ;
 loaded by VeriPB and to check that the proof logger starts with the correct
 constraint ID.</p>
 <p>The value of <code>&lt;nProblemConstraints&gt;</code> is the number of constraints counting
-equalities twice. This is because equalities in the input formula are replaced
-by two inequalities, where the first inequality is <code>&gt;=</code> and the second <code>&lt;=</code>.
-Afterwards, the <code>i</code>-th inequality in the input formula gets <code>ID := IDmax + i</code>.</p>
+equalities twice. This is because equalities are replaced as two inequalities.</p>
 <p>If the constraint count does not match, then the verification fails.</p>
 <p>For example if we have the OPB file</p>
 <pre><code>* #variable= 3 #constraint= 1
@@ -1136,14 +1154,14 @@ soli &lt;literal&gt; &lt;literal&gt; ... : &lt;objective value&gt; ;
 <pre><code>max: &lt;coefficient&gt; &lt;literal&gt; &lt;coefficient&gt; &lt;literal&gt; ... ;
 </code></pre>
 <p>This rule performs the same checks as the <a href="#sol-log-solution">log (sol)ution rule</a>.</p>
-<p>If the check is successful then the constraint <span class="arithmatex"><script type="math/tex">f(x) \leq f(\rho) - 1</script></span> is added
-with <code>ConstraintID := IDmax + 1</code>. If the check is not successful then
+<p>If the check is successful then the solution-improving constraint <span class="arithmatex"><script type="math/tex">f(x) \leq f(\rho) - 1</script></span> is added
+with <code>ConstraintID := IDmax + 1</code> to the core set. If the check is not successful then
 verification fails.</p>
 <h3 id="obji-log-objective-value-and-add-objective-improving-constraint">(obji) Log objective value and Add Objective-Improving Constraint</h3>
 <pre><code>obji &lt;objective value&gt; ;
 </code></pre>
-<p>Add the constraint <span class="arithmatex"><script type="math/tex">f(x) \leq <objective value></script></span> with <code>ConstraintID := IDmax +
-1</code>, without requiring an immediate solution check.</p>
+<p>Add the solution-improving constraint <span class="arithmatex"><script type="math/tex">f(x) \leq <objective value></script></span> with <code>ConstraintID := IDmax +
+1</code> to the core set, without requiring an immediate solution check.</p>
 <h3 id="solx-log-solution-and-add-solution-excluding-constraint">(solx) Log Solution and Add Solution-Excluding Constraint</h3>
 <pre><code>solx &lt;literal&gt; &lt;literal&gt; ... ;
 solx x1 ~x2 ;
@@ -1154,7 +1172,7 @@ solx x1 ~x2 ;
 </code></pre>
 <p>This rule performs the same checks as the <a href="#sol-log-solution">log (sol)ution rule</a>.</p>
 <p>If the check for solution <span class="arithmatex"><script type="math/tex">\rho</script></span> is successful then the clause <span class="arithmatex"><script type="math/tex">\sum_{\{x \in P : \rho(x) = 0\}} x + \sum_{\{x \in P : \rho(x) = 1\}} \overline{x} \geq 1</script></span> is added with <code>ConstraintID := IDmax +
-1</code>, which consists of the negation of all
+1</code> to the core set, which consists of the negation of all
 literals which are in the preserved set <span class="arithmatex"><script type="math/tex">P</script></span>.
 Hence, all solutions where the preserved variables are set in the same way
 as in the current solution are no longer allowed.</p>

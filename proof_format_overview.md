@@ -53,6 +53,24 @@ The left implication (`<==`) requires exactly one literal on the left; the
 right implication (`==>`) allows one or more. These are interpreted as standard PB 
 inequalities and can be used anywhere an OPB-style constraint is expected.
 
+#### Equality Constraints
+
+Equalities in the input OPB formula are interpreted as two inequalities, where the
+first inequality is `>=` and the second `<=`. Hence, an equality constraint will count
+as two constraints when parsed by VeriPB.
+
+#### Labels
+
+VeriPB supports labels for constraints in the OPB format. A label starts with the
+character `@` followed by at least one of the characters `a-z, A-Z, 0-9, []{}_^-`.
+To label a constraint, the label needs to be given at the beginning of a line
+introducing a constraint, e.g.,
+```
+@label 1 x1 2 x2 3 x3 >= 3 ;
+```
+Since each label can only map to one constraint, equality constraints can not be
+labelled in the OPB file. 
+
 ### DIMACS CNF
 
 An alternative format for the formula is the [DIMACS CNF
@@ -66,6 +84,7 @@ literal `-i` is `~x<i>`.
 
 #### Clauses
 
+Each clause is viewed as an OPB constraint, where each coefficient is `1` and the right-hand side is also `1`.
 VeriPB follows the semantics of DIMACS CNF with respect to duplicate literals
 in clauses. Hence, the clause `1 -2 1 0` becomes the constraint `1 x1 1 ~x2 >=
 1 ;`.
@@ -85,8 +104,7 @@ The variable `i` in the WCNF format input file is represented by `x<i>`.
 
 #### Hard Clauses
 
-Hard clauses are viewed as OPB constraints, where all coefficients are `1` and
-the right-hand side is `1`.
+Hard clauses are viewed as an OPB constraints and parsed in the same way as clauses in the [DIMACS CNF](<#dimacs-cnf>) format.
 
 #### Soft Clauses
 
@@ -221,7 +239,7 @@ the divisor.
 The divisor is a strictly positive integer and must be the second operand.
 
 Alternatively, the operation can specify division of the constraint in variable
-normal form (non-negated variables) by using `c`
+normal form (non-negated variables) by using `c`.
 
 ```
 <constraint> <divisor> c
@@ -232,6 +250,10 @@ normal form (non-negated variables) by using `c`
 ```
 <constraint> s
 ```
+
+Saturation assumes that the constraint is in normalized form. Each coefficient
+of a constraint is clamped to be at most the right-hand side of the constraint.
+If the right-hand side is negative, then the coefficient for each term is zero.
 
 #### Literal Axioms
 
@@ -911,7 +933,9 @@ the objective is at least the `<lower bound>` has to be derived. This has to be
 done by explicitly deriving a constraint that syntactically implies $C$ (which
 might already be derived in the proof). The ID of the constraint that
 syntactically implies $C$ can optionally be given as a hint for the lower bound
-or VeriPB will search through the database for this constraint.
+or VeriPB will search through the database for this constraint. The claimed
+`<lower bound>` can be at most the objective value of any objective improving
+constraint derived by `soli` or `obji`.  
 
 
 To show the correctness of the `<upper bound>`, there must be a solution that
@@ -997,9 +1021,7 @@ loaded by VeriPB and to check that the proof logger starts with the correct
 constraint ID.
 
 The value of `<nProblemConstraints>` is the number of constraints counting
-equalities twice. This is because equalities in the input formula are replaced
-by two inequalities, where the first inequality is `>=` and the second `<=`.
-Afterwards, the `i`-th inequality in the input formula gets `ID := IDmax + i`.
+equalities twice. This is because equalities are replaced as two inequalities.
 
 If the constraint count does not match, then the verification fails.
 
@@ -1204,8 +1226,8 @@ max: <coefficient> <literal> <coefficient> <literal> ... ;
 
 This rule performs the same checks as the [log (sol)ution rule](#sol-log-solution).
 
-If the check is successful then the constraint $f(x) \leq f(\rho) - 1$ is added
-with `ConstraintID := IDmax + 1`. If the check is not successful then
+If the check is successful then the solution-improving constraint $f(x) \leq f(\rho) - 1$ is added
+with `ConstraintID := IDmax + 1` to the core set. If the check is not successful then
 verification fails.
 
 ### (obji) Log objective value and Add Objective-Improving Constraint
@@ -1214,8 +1236,8 @@ verification fails.
 obji <objective value> ;
 ```
 
-Add the constraint $f(x) \leq <objective value>$ with `ConstraintID := IDmax +
-1`, without requiring an immediate solution check.
+Add the solution-improving constraint $f(x) \leq <objective value>$ with `ConstraintID := IDmax +
+1` to the core set, without requiring an immediate solution check.
 
 ### (solx) Log Solution and Add Solution-Excluding Constraint
 
@@ -1233,7 +1255,7 @@ preserved: <variable> <variable> ... ;
 This rule performs the same checks as the [log (sol)ution rule](#sol-log-solution).
 
 If the check for solution $\rho$ is successful then the clause $\sum_{\{x \in P : \rho(x) = 0\}} x + \sum_{\{x \in P : \rho(x) = 1\}} \overline{x} \geq 1$ is added with `ConstraintID := IDmax +
-1`, which consists of the negation of all
+1` to the core set, which consists of the negation of all
 literals which are in the preserved set $P$.
 Hence, all solutions where the preserved variables are set in the same way
 as in the current solution are no longer allowed.
