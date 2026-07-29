@@ -934,8 +934,8 @@ done by explicitly deriving a constraint that syntactically implies $C$ (which
 might already be derived in the proof). The ID of the constraint that
 syntactically implies $C$ can optionally be given as a hint for the lower bound
 or VeriPB will search through the database for this constraint. The claimed
-`<lower bound>` can be at most the objective value of any objective improving
-constraint derived by `soli` or `obji`.  
+`<lower bound>` can be at most the objective value of any logged solution or
+any objective improving constraint derived by `obji`.
 
 
 To show the correctness of the `<upper bound>`, there must be a solution that

@@ -956,8 +956,8 @@ done by explicitly deriving a constraint that syntactically implies <span class=
 might already be derived in the proof). The ID of the constraint that
 syntactically implies <span class="arithmatex"><script type="math/tex">C</script></span> can optionally be given as a hint for the lower bound
 or VeriPB will search through the database for this constraint. The claimed
-<code>&lt;lower bound&gt;</code> can be at most the objective value of any objective improving
-constraint derived by <code>soli</code> or <code>obji</code>.  </p>
+<code>&lt;lower bound&gt;</code> can be at most the objective value of any logged solution or
+any objective improving constraint derived by <code>obji</code>.</p>
 <p>To show the correctness of the <code>&lt;upper bound&gt;</code>, there must be a solution that
 has an objective value that is at least as good as the <code>&lt;upper bound&gt;</code>. The
 solution can be given as a hint, where the solution is evaluated with respect to the original problem, or otherwise must have been logged before in
