@@ -1348,8 +1348,9 @@ the grammar document for the full syntax.
 The following 2 rules can be used to track the time of names sections in the
 proof. If there are multiple sections with the same name, then the times are
 added up to a total time. The total time is displayed at the end of the
-checking when the option `--stats` is used. The `<name>` of a section can be
-any string that does not contain a whitespace.
+checking when the option `--stats` is used. The `<name>` of a section has to
+start with a letter in `A-Z, a-z` or an underscore followed by any number of
+characters in `a-z, A-Z, 0-9, []{}_^-`.
 
 #### (start_time) Start Custom Timer
 
