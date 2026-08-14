@@ -1200,7 +1200,8 @@ sol x1 ~x2 : 3;
 ```
 
 Given a partial assignment in form of a list of `<literal>`, i.e., variable
-names with `~` as prefix to indicate negation, check that after unit propagation we are left with an assignment that satisfies all constraints in the database. A constraint is satisfied if the sum of the coefficients for the satisfied literals in the constraint is larger than the right-hand side of the constraint.
+names with `~` as prefix to indicate negation, check that after unit propagation we are left with an assignment that satisfies all core constraints in the database.
+A constraint is satisfied if the sum of the coefficients of the satisfied literals in the constraint is at least the right-hand side of the constraint.
 
 If the optional `<objective_value>` hint is provided, it also checks that the provided
 `<objective_value>` is achieved by the given assignment.
@@ -1224,7 +1225,7 @@ or
 max: <coefficient> <literal> <coefficient> <literal> ... ;
 ```
 
-This rule performs the same checks as the [log (sol)ution rule](#sol-log-solution).
+This rule performs the same checks as the [ordinary log solution rule](#sol-log-solution) and additionally checks that all variables in the objective are assigned by the propagated assignment.
 
 If the check is successful then the solution-improving constraint $f(x) \leq f(\rho) - 1$ is added
 with `ConstraintID := IDmax + 1` to the core set. If the check is not successful then
@@ -1252,7 +1253,7 @@ $P$, i.e., it contains a line of the form
 preserved: <variable> <variable> ... ;
 ```
 
-This rule performs the same checks as the [log (sol)ution rule](#sol-log-solution).
+This rule performs the same checks as the [ordinary log solution rule](#sol-log-solution) and additionally checks that all variables in the preserved set are assigned by the propagated assignment.
 
 If the check for solution $\rho$ is successful then the clause $\sum_{\{x \in P : \rho(x) = 0\}} x + \sum_{\{x \in P : \rho(x) = 1\}} \overline{x} \geq 1$ is added with `ConstraintID := IDmax +
 1` to the core set, which consists of the negation of all
