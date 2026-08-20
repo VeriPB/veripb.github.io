@@ -47,11 +47,53 @@ shorthands as syntactic sugar for standard PB inequalities:
 ```
 z1 z2 ~z3 ==> +1 x1 +2 x2 >= 2;  % if z1 ∧ z2 ∧ ¬z3 then x1 + 2x2 ≥ 2
 z1        <== +1 x1 +2 x2 >= 2;  % if x1 + 2x2 ≥ 2 then z1
+z1       <==> +1 x1 +2 x2 >= 2;  % both of the above
 ```
 
 The left implication (`<==`) requires exactly one literal on the left; the
-right implication (`==>`) allows one or more. These are interpreted as standard PB 
-inequalities and can be used anywhere an OPB-style constraint is expected.
+right implication (`==>`) allows one or more, which are read as their
+conjunction. These are interpreted as standard PB inequalities and can be used
+anywhere an OPB-style constraint is expected.
+
+The equivalence (`<==>`) is the two implications together and is loaded as two
+constraints, the `==>` direction followed by the `<==` direction. It takes
+exactly one literal on the left, as the left implication does, and it is only
+accepted in the formula file: no rule of the proof format derives more than one
+constraint.
+
+For a right implication the literals are negated and added with the degree as
+coefficient to the constraint, so the first example above is loaded as
+
+```
+2 ~z1 2 ~z2 2 z3 1 x1 2 x2 >= 2 ;
+```
+
+For a left implication it is the constraint that is negated, and the literal is
+added with the degree of the negation as coefficient, so the second example is
+loaded as
+
+```
+2 z1 1 ~x1 2 ~x2 >= 2 ;
+```
+
+In both cases the constraint is normalized first, so the degree that is used is
+the one after terms that cancel each other have been merged. An implication
+whose truth does not depend on the literals loses them:
+
+- If the constraint of a right implication is trivially satisfied, i.e., its
+  degree is not positive once it is normalized, then it is implied by anything
+  and the constraint is loaded as it is. For example, `z1 z2 ==> 1 x1 >= -1` is
+  loaded as `1 x1 >= -1`.
+- If the constraint of a left implication is contradicting, i.e., its degree is
+  larger than the sum of its coefficients once it is normalized, then it implies
+  anything and its (trivially satisfied) negation is loaded. For example,
+  `z1 <== 1 x1 >= 5` is loaded as `1 ~x1 >= -3`.
+
+A right implication of an equality is split into two constraints and counts as
+two constraints, just like a plain equality. Neither a left implication nor an
+equivalence of an equality is accepted, since the equality would be split into
+the two directions `>=` and `<=` and the literal would then be implied by
+whichever of the two holds, i.e., by a tautology.
 
 #### Equality Constraints
 
@@ -68,8 +110,26 @@ introducing a constraint, e.g.,
 ```
 @label 1 x1 2 x2 3 x3 >= 3 ;
 ```
-Since each label can only map to one constraint, equality constraints can not be
-labelled in the OPB file. 
+
+Since each label maps to one constraint, a line that stands for more than one
+constraint carries one label for each of them, and the i-th label names the i-th
+constraint the line is loaded as. An equality is loaded as its `>=` direction
+followed by its `<=` direction, so
+
+```
+@sum_lo @sum_hi 1 x1 1 x2 = 1 ;
+```
+
+names `1 x1 1 x2 >= 1` as `@sum_lo` and `1 ~x1 1 ~x2 >= 1` as `@sum_hi`. The same
+applies to a right implication of an equality. An equivalence is loaded as its
+`==>` direction followed by its `<==` direction, so
+
+```
+@right @left z1 <==> 1 x1 1 x2 >= 1 ;
+```
+
+names those two directions in that order. A line carries either no labels at
+all or exactly as many as it has constraints. Any other number of labels is an error.
 
 ### DIMACS CNF
 
