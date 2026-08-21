@@ -1245,9 +1245,9 @@ formula.
   % log solution and add solution-excluding constraint
   solx <literal> <literal> ... ;
   % add variable to preserved set
-  preserved_add <variable> <OPB constraint> ;
+  preserved_add <variable> : <OPB constraint> ;
   % remove variable from preserved set
-  preserved_rm <variable> <OPB constraint> ;
+  preserved_rm <variable> : <OPB constraint> ;
 ```
 
 ### (sol) Log Solution
@@ -1325,8 +1325,8 @@ as in the current solution are no longer allowed.
 ### (preserved_add) Add a Variable to the Preserved Set of Variables
 
 ```
-preserved_add <variable x> <OPB constraint C> ;
-preserved_add x231 1 ~x34 >= 1 ;
+preserved_add <variable x> : <OPB constraint C> ;
+preserved_add x231 : 1 ~x34 >= 1 ;
 ```
 
 Add a variable to the preserved set. Adding a variable to the preserved set is
@@ -1342,8 +1342,8 @@ constraints.
 ### (preserved_rm) Remove a Variable from the Preserved Set of Variables
 
 ```
-preserved_rm <variable x> <OPB constraint C> ;
-preserved_rm x231 1 ~x34 >= 1 ;
+preserved_rm <variable x> : <OPB constraint C> ;
+preserved_rm x231 : 1 ~x34 >= 1 ;
 ```
 
 Remove a variable from the preserved set. Removing a variable from the

@@ -1173,9 +1173,9 @@ formula.</p>
   % log solution and add solution-excluding constraint
   solx &lt;literal&gt; &lt;literal&gt; ... ;
   % add variable to preserved set
-  preserved_add &lt;variable&gt; &lt;OPB constraint&gt; ;
+  preserved_add &lt;variable&gt; : &lt;OPB constraint&gt; ;
   % remove variable from preserved set
-  preserved_rm &lt;variable&gt; &lt;OPB constraint&gt; ;
+  preserved_rm &lt;variable&gt; : &lt;OPB constraint&gt; ;
 </code></pre>
 <h3 id="sol-log-solution">(sol) Log Solution</h3>
 <pre><code>sol &lt;literal&gt; &lt;literal&gt; ... ;
@@ -1223,8 +1223,8 @@ literals which are in the preserved set <span class="arithmatex"><script type="m
 Hence, all solutions where the preserved variables are set in the same way
 as in the current solution are no longer allowed.</p>
 <h3 id="preserved_add-add-a-variable-to-the-preserved-set-of-variables">(preserved_add) Add a Variable to the Preserved Set of Variables</h3>
-<pre><code>preserved_add &lt;variable x&gt; &lt;OPB constraint C&gt; ;
-preserved_add x231 1 ~x34 &gt;= 1 ;
+<pre><code>preserved_add &lt;variable x&gt; : &lt;OPB constraint C&gt; ;
+preserved_add x231 : 1 ~x34 &gt;= 1 ;
 </code></pre>
 <p>Add a variable to the preserved set. Adding a variable to the preserved set is
 only sound if the possible number of solutions over the preserved set is not
@@ -1235,8 +1235,8 @@ proofgoals. The proofgoal <code>#1</code> has to establish that <code>x ==&gt; C
 proofgoal <code>#2</code> has to establish that <code>x &lt;== C</code>, which are both pseudo-Boolean
 constraints.</p>
 <h3 id="preserved_rm-remove-a-variable-from-the-preserved-set-of-variables">(preserved_rm) Remove a Variable from the Preserved Set of Variables</h3>
-<pre><code>preserved_rm &lt;variable x&gt; &lt;OPB constraint C&gt; ;
-preserved_rm x231 1 ~x34 &gt;= 1 ;
+<pre><code>preserved_rm &lt;variable x&gt; : &lt;OPB constraint C&gt; ;
+preserved_rm x231 : 1 ~x34 &gt;= 1 ;
 </code></pre>
 <p>Remove a variable from the preserved set. Removing a variable from the
 preserved set is only sound if the possible number of solutions over the
