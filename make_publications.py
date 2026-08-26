@@ -21,14 +21,38 @@ BIBTYPE_PRIORITY = [
     "conferences",
 ]
 
+def month_to_number(month):
+    """Convert month to number for sorting"""
+    months = [
+        "january", "february", "march", "april",
+        "may", "june", "july", "august",
+        "september", "october", "november", "december"
+    ]
+
+    parts = month.lower().split("-")
+
+    if len(parts) == 1:
+        return months.index(parts[0])
+
+    if len(parts) == 2:
+        first = months.index(parts[0])
+        second = months.index(parts[1])
+
+        if second != first + 1:
+            raise ValueError(f"Months are not consecutive: {month}")
+
+        return first + 0.5
+
+    raise ValueError(f"Invalid month: {month}")
 
 def sort_key(bib_entry):
     """Sort by year in then bib type"""
-    year_val = int(bib_entry["year"]) if bib_entry["year"].isdigit() else float("inf")
+    year_val = int(bib_entry["year"])
+    month_val = month_to_number(bib_entry["month"])
     type_val = float("inf")
     if bib_entry["ENTRYTYPE"] in BIBTYPE_PRIORITY:
         type_val = BIBTYPE_PRIORITY.index(bib_entry["ENTRYTYPE"])
-    return (year_val, type_val)
+    return (-year_val, -month_val, type_val)
 
 
 def clean_entry(entry):
@@ -38,6 +62,13 @@ def clean_entry(entry):
         v = v.strip()
 
         # replace special characters - I'm sure there's a better way to do this...
+        # first any constructions that require the braces {}
+        v = v.replace("\\c{c}", "&ccedil;")
+        
+        # then remove the braces (to avoid having to distinguish e.g. \"{a} and \"a)
+        v = v.replace("{", "")
+        v = v.replace("}", "")
+        
         v = v.replace("\\AE", "Æ")
         v = v.replace("\\$\\$", " ")
         v = v.replace("~", " ")
@@ -52,11 +83,9 @@ def clean_entry(entry):
         v = v.replace("\\'c", "&cacute;")
         v = v.replace("\\'o", "&oacute;")
         v = v.replace("\\'e", "&eacute;")
-        v = v.replace("\\c{c}", "&ccedil;")
 
-        v = v.replace("{", "")
-        v = v.replace("}", "")
         v = v.replace('"', "")
+        v = v.replace('\\nobreakdash', "")
 
         # remove trailing comma and dot
         if len(v) > 0:
@@ -139,13 +168,13 @@ def get_bib_entry_as_html(entry):
     def get_link():
         # URL / DOI / WWW
         if "url" in entry and entry["url"] != "":
-            return entry["url"]
+            return f'URL:  <a href="{entry["url"]}">{entry["url"]}</a>'
         elif "www" in entry:
-            return entry["www"]
+            return f'URL:  <a href="{entry["www"]}">{entry["url"]}</a>'
         elif "doi" in entry:
-            return "https://dx.doi.org/%s" % entry["doi"]
+            return f'<a href="https://dx.doi.org/{entry["doi"]}">doi:{entry["doi"]}</a>'
         elif "hal_id" in entry:
-            return "https://hal.archives-ouvertes.fr/%s" % entry["hal_id"]
+            return f'<a href="https://hal.archives-ouvertes.fr/{entry["hal_id"]}">HAL: {entry["hal_id"]}</a>'
 
         return None
 
@@ -169,8 +198,7 @@ def get_bib_entry_as_html(entry):
 
     link = get_link()
     if link:
-        out.insert(1, f'<a href="{link}">')
-        out.append("</a>")
+        out.append(link)
     # Terminate list
     out.append("\n</li>\n")
     out.append("<br>\n")
