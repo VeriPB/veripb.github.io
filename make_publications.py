@@ -185,10 +185,10 @@ def get_bib_entry_as_html(entry):
         out.append(span("author", entry["author"] + ","))
         out.append("\n")
 
-    out.append(format_title_or_chapter() + ",\n")
+    out.append(format_title_or_chapter())
     publisher_html = format_publisher()
     if publisher_html:
-        out.append(publisher_html)
+        out.append(",\n" + publisher_html)
 
     vp = format_volume_pages_notes()
     if vp:
