@@ -1243,7 +1243,8 @@ formula.
   soli <literal> <literal> ... ;
   soli <literal> <literal> ... : <objective value>;
   % log solution and add solution-excluding constraint
-  solx <literal> <literal> ... ;
+  % (variables can be marked as shrunk using *<variable>)
+  solx <literal or *variable> <literal or *variable> ... ;
   % add variable to preserved set
   preserved_add <variable> : <OPB constraint> ;
   % remove variable from preserved set
@@ -1303,8 +1304,9 @@ Add the solution-improving constraint $f(x) \leq <objective value>$ with `Constr
 ### (solx) Log Solution and Add Solution-Excluding Constraint
 
 ```
-solx <literal> <literal> ... ;
+solx <literal or *variable> <literal or *variable> ... ;
 solx x1 ~x2 ;
+solx *x1 x2 *x3 ;
 ```
 
 This rule can only be used if the OPB file specifies a preserved set of variables
@@ -1312,6 +1314,9 @@ $P$, i.e., it contains a line of the form
 ```
 preserved: <variable> <variable> ... ;
 ```
+and the problem does not have an objective. Moreover, it can not be used once
+the guarantees of [checked deletion](#deletion-from-the-core-set) have been
+lost, i.e., after unchecked deletion has been used.
 
 This rule performs the same checks as the [ordinary log solution rule](#sol-log-solution) and additionally checks that all variables in the preserved set are assigned by the propagated assignment.
 
@@ -1320,6 +1325,14 @@ If the check for solution $\rho$ is successful then the clause $\sum_{\{x \in P 
 literals which are in the preserved set $P$.
 Hence, all solutions where the preserved variables are set in the same way
 as in the current solution are no longer allowed.
+
+Variables can be marked as *shrunk* by writing `*<variable>`, meaning that the
+constraints are satisfied no matter how these variables are assigned. For
+example, `solx *x1 x2 *x3 ;` logs that setting `x2` to true yields a solution
+for any values of `x1` and `x3`. Only preserved variables can be shrunk, and
+they do not need to be assigned. Shrunk variables must stay unassigned, also
+after propagation. The added clause then only contains the preserved variables
+that are not shrunk, so it excludes all solutions in the logged cube at once.
 
 
 ### (preserved_add) Add a Variable to the Preserved Set of Variables

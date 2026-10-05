@@ -1171,7 +1171,8 @@ formula.</p>
   soli &lt;literal&gt; &lt;literal&gt; ... ;
   soli &lt;literal&gt; &lt;literal&gt; ... : &lt;objective value&gt;;
   % log solution and add solution-excluding constraint
-  solx &lt;literal&gt; &lt;literal&gt; ... ;
+  % (variables can be marked as shrunk using *&lt;variable&gt;)
+  solx &lt;literal or *variable&gt; &lt;literal or *variable&gt; ... ;
   % add variable to preserved set
   preserved_add &lt;variable&gt; : &lt;OPB constraint&gt; ;
   % remove variable from preserved set
@@ -1209,19 +1210,30 @@ verification fails.</p>
 <p>Add the solution-improving constraint <span class="arithmatex"><script type="math/tex">f(x) \leq <objective value></script></span> with <code>ConstraintID := IDmax +
 1</code> to the core set, without requiring an immediate solution check.</p>
 <h3 id="solx-log-solution-and-add-solution-excluding-constraint">(solx) Log Solution and Add Solution-Excluding Constraint</h3>
-<pre><code>solx &lt;literal&gt; &lt;literal&gt; ... ;
+<pre><code>solx &lt;literal or *variable&gt; &lt;literal or *variable&gt; ... ;
 solx x1 ~x2 ;
+solx *x1 x2 *x3 ;
 </code></pre>
 <p>This rule can only be used if the OPB file specifies a preserved set of variables
 <span class="arithmatex"><script type="math/tex">P</script></span>, i.e., it contains a line of the form</p>
 <pre><code>preserved: &lt;variable&gt; &lt;variable&gt; ... ;
 </code></pre>
+<p>and the problem does not have an objective. Moreover, it can not be used once
+the guarantees of <a href="#deletion-from-the-core-set">checked deletion</a> have been
+lost, i.e., after unchecked deletion has been used.</p>
 <p>This rule performs the same checks as the <a href="#sol-log-solution">ordinary log solution rule</a> and additionally checks that all variables in the preserved set are assigned by the propagated assignment.</p>
 <p>If the check for solution <span class="arithmatex"><script type="math/tex">\rho</script></span> is successful then the clause <span class="arithmatex"><script type="math/tex">\sum_{\{x \in P : \rho(x) = 0\}} x + \sum_{\{x \in P : \rho(x) = 1\}} \overline{x} \geq 1</script></span> is added with <code>ConstraintID := IDmax +
 1</code> to the core set, which consists of the negation of all
 literals which are in the preserved set <span class="arithmatex"><script type="math/tex">P</script></span>.
 Hence, all solutions where the preserved variables are set in the same way
 as in the current solution are no longer allowed.</p>
+<p>Variables can be marked as <em>shrunk</em> by writing <code>*&lt;variable&gt;</code>, meaning that the
+constraints are satisfied no matter how these variables are assigned. For
+example, <code>solx *x1 x2 *x3 ;</code> logs that setting <code>x2</code> to true yields a solution
+for any values of <code>x1</code> and <code>x3</code>. Only preserved variables can be shrunk, and
+they do not need to be assigned. Shrunk variables must stay unassigned, also
+after propagation. The added clause then only contains the preserved variables
+that are not shrunk, so it excludes all solutions in the logged cube at once.</p>
 <h3 id="preserved_add-add-a-variable-to-the-preserved-set-of-variables">(preserved_add) Add a Variable to the Preserved Set of Variables</h3>
 <pre><code>preserved_add &lt;variable x&gt; : &lt;OPB constraint C&gt; ;
 preserved_add x231 : 1 ~x34 &gt;= 1 ;
